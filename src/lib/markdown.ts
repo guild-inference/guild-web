@@ -3,7 +3,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 export const markdownProcessor = createMarkdownProcessor({
   syntaxHighlight: 'shiki',
-  shikiConfig: { theme: 'github-light' },
+  shikiConfig: { theme: 'github-dark' },
   remarkPlugins: [remarkMath],
   rehypePlugins: [rehypeKatex],
 });
