@@ -1,0 +1,121 @@
+{
+  "repository": "guild-inference/Guild",
+  "commit": "140f6f765ffc77d2b7b9aebdc6e41a4e3e9bc3f6",
+  "documents": [
+    {
+      "slug": "repository-readme",
+      "title": "Repository README",
+      "category": "Project",
+      "path": "README.md"
+    },
+    {
+      "slug": "architecture",
+      "title": "Architecture overview",
+      "category": "Architecture",
+      "path": "docs/architecture/README.md"
+    },
+    {
+      "slug": "execution-lifecycle",
+      "title": "Execution lifecycle",
+      "category": "Architecture",
+      "path": "docs/architecture/EXECUTION_LIFECYCLE.md"
+    },
+    {
+      "slug": "modular-runtime",
+      "title": "Modular runtime",
+      "category": "Architecture",
+      "path": "docs/architecture/MODULAR_RUNTIME.md"
+    },
+    {
+      "slug": "model-runners",
+      "title": "Model runners",
+      "category": "Architecture",
+      "path": "docs/architecture/MODEL_RUNNERS.md"
+    },
+    {
+      "slug": "external-backends",
+      "title": "External backends & HIP",
+      "category": "Architecture",
+      "path": "docs/architecture/EXTERNAL_BACKENDS.md"
+    },
+    {
+      "slug": "gpack",
+      "title": "GPACK format",
+      "category": "Formats & ABI",
+      "path": "docs/architecture/GPACK_FORMAT.md"
+    },
+    {
+      "slug": "gexec",
+      "title": "GEXEC contract",
+      "category": "Formats & ABI",
+      "path": "docs/architecture/GEXEC_CONTRACT.md"
+    },
+    {
+      "slug": "kernel-abi",
+      "title": "Kernel ABI",
+      "category": "Formats & ABI",
+      "path": "docs/architecture/KERNEL_ABI.md"
+    },
+    {
+      "slug": "gkernel",
+      "title": "Kernel packages",
+      "category": "Formats & ABI",
+      "path": "docs/architecture/GKERNEL_FORMAT.md"
+    },
+    {
+      "slug": "gkmodule",
+      "title": "Runtime modules",
+      "category": "Formats & ABI",
+      "path": "docs/architecture/GKMODULE.md"
+    },
+    {
+      "slug": "phase6",
+      "title": "Phase 6: Long context",
+      "category": "Performance archive",
+      "path": "docs/performance/PHASE6_LONG_CONTEXT_OPTIMIZATION.md"
+    },
+    {
+      "slug": "phase65",
+      "title": "Phase 6.5: Runtime optimization",
+      "category": "Performance archive",
+      "path": "docs/performance/PHASE65_GENERAL_OPTIMIZATION.md"
+    },
+    {
+      "slug": "phase66",
+      "title": "Phase 6.6 & 6.6.1: Adaptive decoding",
+      "category": "Performance archive",
+      "path": "docs/performance/PHASE66_ADAPTIVE_SPECULATIVE_DECODING.md"
+    },
+    {
+      "slug": "contributing",
+      "title": "Building & contributing",
+      "category": "Development",
+      "path": "docs/CONTRIBUTING.md"
+    },
+    {
+      "slug": "code-style",
+      "title": "Code style",
+      "category": "Development",
+      "path": "docs/quality/CODE_STYLE.md"
+    },
+    {
+      "slug": "troubleshooting",
+      "title": "Correctness & recovery",
+      "category": "Development",
+      "path": "docs/CORRECTNESS_RECOVERY.md"
+    },
+    {
+      "slug": "versioning",
+      "title": "Version policy",
+      "category": "Project",
+      "path": "docs/releases/VERSIONING.md"
+    },
+    {
+      "slug": "pipelines",
+      "title": "Build & release pipelines",
+      "category": "Project",
+      "path": "docs/releases/PIPELINES.md"
+    }
+  ],
+  "evidence": ["src/models/registry.cpp", "src/model/archetype.cpp", "LICENSE"]
+}

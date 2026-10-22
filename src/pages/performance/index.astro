@@ -1,0 +1,225 @@
+---
+import Shell from '../../layouts/Shell.astro';
+import { link } from '../../lib/links';
+import { source } from '../../lib/source';
+const rows = [
+  {
+    id: 'ornith-w2',
+    model: 'Ornith 1.5 35B',
+    quant: 'Q4_K_M',
+    workload: 'W2 · Summarization',
+    tokens: '256 / 128',
+    normal: '50.27',
+    fixed: 'Lookup · 82.19',
+    adaptive: '80.08–80.84',
+    note: 'Favorable input/output overlap. Fixed lookup is faster in the reported results.',
+    section: '§8.3 A',
+  },
+  {
+    id: 'ornith-w7',
+    model: 'Ornith 1.5 35B',
+    quant: 'Q4_K_M',
+    workload: 'W7 · Creative prose',
+    tokens: '256 / 128',
+    normal: '49.75',
+    fixed: 'Lookup · 48.84',
+    adaptive: '49.10–49.18',
+    note: 'Adaptive remains below normal. Fallback does not guarantee zero regression.',
+    section: '§8.3 A',
+  },
+  {
+    id: 'qwen-w3',
+    model: 'Qwen3.8-Flash-Next',
+    quant: 'UD-IQ4_XS',
+    workload: 'W3 · JSON schema',
+    tokens: '256 / 64',
+    normal: '18.33',
+    fixed: 'MTP · 23.43',
+    adaptive: '23.52',
+    note: 'Development result; the small difference from fixed MTP is not a demonstrated statistically significant win.',
+    section: '§8.3 B',
+  },
+  {
+    id: 'qwen-w8',
+    model: 'Qwen3.8-Flash-Next',
+    quant: 'UD-IQ4_XS',
+    workload: 'W8 · Mathematical reasoning',
+    tokens: '256 / 64',
+    normal: '18.40',
+    fixed: 'MTP · 23.94',
+    adaptive: '23.68',
+    note: 'Phase 6.6 adaptive was 24.31 tok/s. This Phase 6.6.1 result regresses versus that revision and fixed MTP.',
+    section: '§8.3 B',
+  },
+];
+---
+
+<Shell
+  property="guild"
+  path="performance/"
+  title="Guild performance — The measurement and its limits"
+  description="Selected Phase 6.6.1 measurements on dual Xeon Gold 6130 and GTX 1070, with workload, quantization, baseline, and explicit limitations."
+>
+  <section class="subhero wrap">
+    <div class="eyebrow">Evidence / performance</div><h1>
+      The measurement.<br /><em>And its limits.</em>
+    </h1><p class="lead">
+      Selected reported results, not a universal speed claim. Every row below belongs to a specific
+      model, workload, and decoding configuration.
+    </p>
+  </section>
+  <section class="section wrap">
+    <div class="grid-two">
+      <div class="paper">
+        <span class="section-label">Measured machine</span><h2
+          style="font-size:2.5rem;margin-top:20px"
+        >
+          A large-RAM server.<br />An 8 GiB GPU.
+        </h2><ul class="check-list">
+          <li>CPU<span>2× Xeon Gold 6130 · 32C / 64T</span></li><li>
+            Memory<span>376 GiB DDR4 · dual NUMA</span>
+          </li><li>GPU<span>GeForce GTX 1070 · 8 GiB</span></li><li>
+            Platform<span>Linux · AVX-512 capable</span>
+          </li>
+        </ul>
+      </div><div>
+        <h2 style="font-size:2.8rem">Reading these results</h2><p style="margin-top:20px">
+          Source: Phase 6.6.1 tables in the report snapshot at <code>140f6f7</code>. Engine change: <code
+            >c7c8c79</code
+          >; earlier Phase 6.6: <code>ed7a5db</code>. GEXEC active, CPU expert path, max draft 4,
+          greedy generation. Qwen cross-window parity runs use <code>GUILD_IQ_MT_MIN=1</code>.
+        </p><p style="margin-top:18px">
+          These are decode tokens per second, not end-to-end request throughput. Ranges combine
+          reported development runs and revisions; they are not confidence intervals or paired
+          median/dispersion estimates.
+        </p><p style="margin-top:18px">
+          GEXEC artifacts were regenerated during tuning. Exact per-row calibration identity is not
+          established here, limiting controlled cross-revision comparisons.
+        </p>
+      </div>
+    </div>
+  </section>
+  <section class="section wrap">
+    <div class="section-heading">
+      <span class="section-label">01 / Selected development results</span><h2>
+        The workload changes<br />the outcome.
+      </h2>
+    </div><div
+      class="table-scroll"
+      tabindex="0"
+      role="region"
+      aria-label="Benchmark results; scroll horizontally on small screens"
+    >
+      <table>
+        <caption style="text-align:left;padding:15px;font-size:12px"
+          >Phase 6.6.1 · decode tok/s · prompt / generated token counts</caption
+        ><thead
+          ><tr
+            ><th scope="col">Model / quantization</th><th scope="col">Workload</th><th scope="col"
+              >Prompt / gen</th
+            ><th scope="col">Normal</th><th scope="col">Fixed strategy</th><th scope="col"
+              >Adaptive</th
+            ><th scope="col">Source</th></tr
+          ></thead
+        ><tbody
+          >{
+            rows.map((r) => (
+              <tr>
+                <>
+                  <td>
+                    {r.model}
+                    <br />
+                    <code>{r.quant}</code>
+                  </td>
+                  <td>{r.workload}</td>
+                  <td>{r.tokens}</td>
+                  <td>{r.normal}</td>
+                  <td>{r.fixed}</td>
+                  <td>{r.adaptive}</td>
+                  <td>
+                    <a
+                      href={source(
+                        'docs/performance/PHASE66_ADAPTIVE_SPECULATIVE_DECODING.md',
+                        '#83-controlled-phase-66-vs-phase-661-benchmark-comparison',
+                      )}
+                    >
+                      {r.section} ↗
+                    </a>
+                  </td>
+                </>
+              </tr>
+            ))
+          }</tbody
+        >
+      </table>
+    </div><div class="grid-two" style="margin-top:25px">
+      {
+        rows.map((r) => (
+          <div class="paper">
+            <>
+              <h3>
+                {r.model} / {r.workload}
+              </h3>
+              <p>{r.note}</p>
+            </>
+          </div>
+        ))
+      }
+    </div><div class="notice">
+      <strong>Held-out counterexample:</strong> Ornith H4 (Riemann tensor) reports 50.16 tok/s normal,
+      42.07 fixed lookup, and 47.92 adaptive. Adaptive is below normal by about 4.5%. The summary table
+      does not provide complete per-run configuration; treat it as a reported observation rather than
+      a reproducible paired estimate.
+    </div>
+  </section>
+  <section class="section wrap">
+    <div class="statement">
+      <div>
+        <span class="eyebrow">02 / Boundaries of the evidence</span><h2>
+          What these numbers<br />do not establish.
+        </h2>
+      </div><div>
+        <p>
+          80+ tok/s Ornith results rely on favorable speculative workloads with substantial reusable
+          text. They are not general chat throughput, all-model performance, or measurements on a
+          small-RAM consumer desktop.
+        </p><p>
+          Offline calibration measures CPU dispatch and lookup/retrieval microbenchmarks. Full
+          verification curves, GPU/context costs, and concurrent-session scaling still include
+          estimates. A doubled CPU job count is not a concurrent-session benchmark.
+        </p><p>
+          The website does not assert successful Phase 6.6.1 sanitizer, complete CUDA CTest,
+          seeded-sampling, or concurrency validation without retained evidence. The engine report is
+          available as a historical source, with those limits noted.
+        </p><p>Ryzen 5 5600X / RTX 5070 results remain pending actual hardware measurement.</p>
+      </div>
+    </div>
+  </section>
+  <section class="section wrap">
+    <div class="section-heading">
+      <span class="section-label">03 / Source archive</span><h2>Read the engineering.</h2>
+    </div><div class="pillars">
+      {
+        [
+          ['phase6', 'Phase 6', 'Populated context, KV placement, and reference comparisons.'],
+          ['phase65', 'Phase 6.5', 'CPU expert kernels, prefill, and end-to-end optimization.'],
+          [
+            'phase66',
+            'Phase 6.6 / 6.6.1',
+            'Adaptive decoding, calibration, reported workloads, and held-out cases.',
+          ],
+        ].map(([slug, title, text]) => (
+          <article class="pillar">
+            <>
+              <h3>{title}</h3>
+              <p>{text}</p>
+              <a class="text-link" href={link('docs', `${slug}/`)}>
+                Read complete source ↗
+              </a>
+            </>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+</Shell>

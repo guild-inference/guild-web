@@ -1,0 +1,150 @@
+---
+import Shell from '../layouts/Shell.astro';
+import Field from '../components/Field.astro';
+import { link } from '../lib/links';
+---
+
+<Shell
+  property="guild"
+  dark
+  title="Guild — More model. Your machine."
+  description="A native, open-source Mixture-of-Experts inference engine. Guild combines GPU VRAM, system RAM, and CPU compute with portable GPACK and hardware-specific GEXEC."
+>
+  <section class="hero wrap">
+    <div class="hero-copy">
+      <div class="eyebrow"><span class="dot"></span> Native inference / open source / v0.x</div><h1>
+        More model.<br /><em>Your machine.</em>
+      </h1><p class="lead">
+        Your GPU is only part of the picture. Guild brings GPU memory, system RAM, and CPU compute
+        together to run Mixture-of-Experts models locally.
+      </p><div class="actions">
+        <a class="button" href={link('docs', 'getting-started/')}
+          >Build your first run <span aria-hidden="true">↗</span></a
+        ><a class="text-link" href="https://github.com/guild-inference/Guild"
+          >Explore the source ↗</a
+        >
+      </div><p class="small-note">C++ · CUDA · HIP / Windows & Linux setup paths</p>
+    </div><Field variant="guild" />
+  </section>
+  <section class="section wrap">
+    <div class="section-heading">
+      <span class="section-label">01 / Built for asymmetry</span><div>
+        <h2>Not every weight.<br />Not all in VRAM.</h2><p>
+          In a sparse MoE model, each token routes through a subset of experts. Guild plans
+          execution across the memory and compute available on your machine.
+        </p>
+      </div>
+    </div><div class="grid-two">
+      <div class="paper">
+        <div class="eyebrow">Conceptual routing / one layer</div><div
+          class="token-controls"
+          role="group"
+          aria-label="Expert routing example"
+        >
+          <button type="button" aria-pressed="true" data-route="ornith">Ornith · 8 / 256</button
+          ><button type="button" aria-pressed="false" data-route="qwen">Qwen · 10 / 512</button>
+        </div><div class="network-grid" aria-hidden="true">
+          {Array.from({ length: 256 }, (_, i) => <i class={i % 32 === 7 ? 'on' : ''} />)}
+        </div><p id="route-caption" role="status">
+          8 of 256 routed experts active per layer. Conceptual selection; not a live model trace.
+        </p>
+      </div><div>
+        <ul class="check-list">
+          <li>
+            <strong>GPU VRAM</strong><span>Dense path, attention state, cache, scratch</span>
+          </li><li>
+            <strong>System RAM</strong><span>Routed expert complement & host KV</span>
+          </li><li><strong>CPU compute</strong><span>Quantized expert execution</span></li><li>
+            <strong>Mapped files</strong><span>Storage-backed expert tier</span>
+          </li>
+        </ul><p style="margin-top:30px;font-size:14px">
+          Designed for large-RAM servers, NUMA systems, and consumer GPUs paired with substantial
+          host memory. The runtime finalizes its plan against live free VRAM.
+        </p><a class="text-link" style="margin-top:25px" href={link('docs', 'architecture/')}
+          >Follow a token through the engine ↗</a
+        >
+      </div>
+    </div>
+  </section>
+  <section class="section wrap">
+    <div class="section-heading">
+      <span class="section-label">02 / Portable model. Local plan.</span><h2>
+        The model travels.<br /><em>The tuning stays local.</em>
+      </h2>
+    </div><div class="flow">
+      <span>GGUF<small>Import weights</small></span><b aria-hidden="true">→</b><span
+        >GPACK<small>Portable container</small></span
+      ><b aria-hidden="true">→</b><span>GEXEC<small>Machine-specific cache</small></span>
+    </div><div class="pillars">
+      <article class="pillar">
+        <h3>GPACK</h3><p>
+          Model weights, architecture metadata, tokenizer assets, and optional expert data in a
+          memory-mapped portable container.
+        </p><a class="text-link" href={link('docs', 'gpack/')}>Read the format ↗</a>
+      </article><article class="pillar">
+        <h3>GEXEC</h3><p>
+          Kernel choices, layouts, placement, and calibration bound to model and environment
+          identity. A mismatch falls back to portable execution.
+        </p><a class="text-link" href={link('docs', 'gexec/')}>Read the contract ↗</a>
+      </article><article class="pillar">
+        <h3>Adaptive decoding</h3><p>
+          Choose among normal decoding, MTP, lookup, and session-local retrieval. Optimize time per
+          committed token, with the target model verifying proposals.
+        </p><a class="text-link" href={link('docs', 'phase66/')}>Read the implementation report ↗</a
+        >
+      </article>
+    </div><p class="small-note">
+      Core and these formats remain under development. Calibration combines measured
+      microbenchmarks, estimates, and live session observations.
+    </p>
+  </section>
+  <section class="section wrap">
+    <div class="statement">
+      <div>
+        <span class="eyebrow">03 / Evidence over headlines</span><h2>
+          Performance is<br /><em>a configuration.</em>
+        </h2>
+      </div><div>
+        <p>
+          Input-grounded speculative workloads can be much faster. Novel prose, short requests, and
+          failed predictions can erase those gains. We publish the workload, hardware, strategy, and
+          limitations alongside each selected result.
+        </p><a class="text-link" href={link('guild', 'performance/')}>Explore measured results ↗</a
+        ><div class="notice">
+          <strong>Measured server:</strong> 2× Xeon Gold 6130, 376 GiB system RAM, GTX 1070 8 GiB, Linux.
+          RTX 5070 desktop results are pending.
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="section wrap">
+    <div class="band">
+      <div>
+        <h2>Start close to the metal.</h2><p>
+          Read the guide. Check compatibility. Build for your hardware.
+        </p>
+      </div><a class="button" href={link('models')}>Find your model ↗</a>
+    </div>
+  </section>
+  <script>
+    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-route]');
+    buttons.forEach((button) =>
+      button.addEventListener('click', () => {
+        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+        const q = button.dataset.route === 'qwen';
+        const total = q ? 512 : 256;
+        const active = q ? 10 : 8;
+        const grid = document.querySelector('.network-grid')!;
+        grid.replaceChildren(
+          ...Array.from({ length: total }, (_, i) => {
+            const node = document.createElement('i');
+            if (i < active) node.className = 'on';
+            return node;
+          }),
+        );
+        document.querySelector('#route-caption')!.textContent =
+          `${active} of ${total} routed experts active per layer. Conceptual selection; not a live model trace.`;
+      }),
+    );
+  </script>
+</Shell>

@@ -1,0 +1,120 @@
+---
+import { markdownProcessor } from '../../lib/markdown';
+import 'katex/dist/katex.min.css';
+import Shell from '../../layouts/Shell.astro';
+import DocsSidebar from '../../components/DocsSidebar.astro';
+import { docs } from '../../lib/docs';
+import { link } from '../../lib/links';
+import { source, revision } from '../../lib/source';
+import { resolveDocHref } from '../../lib/doc-links.mjs';
+export function getStaticPaths() {
+  return docs.map((doc) => ({ params: { slug: doc.slug }, props: { doc } }));
+}
+const { doc } = Astro.props;
+const processor = await markdownProcessor;
+const rendered = await processor.render(doc.markdown);
+const escapeAttr = (v: string) => v.replaceAll('&', '&amp;').replaceAll('"', '&quot;');
+// Preserve the source's unnumbered fragment links alongside numbered heading IDs.
+let code = rendered.code;
+for (const heading of rendered.metadata.headings) {
+  const alias = heading.slug.replace(/^\d+-/, '');
+  if (alias !== heading.slug && code.includes(`href="#${alias}"`)) {
+    const tag = `<h${heading.depth} id="${heading.slug}">`;
+    code = code.replace(tag, `<span id="${alias}" aria-hidden="true"></span>${tag}`);
+  }
+}
+const html = code
+  .replaceAll(
+    '<table>',
+    '<div class="table-scroll" tabindex="0" role="region" aria-label="Documentation table"><table>',
+  )
+  .replaceAll('</table>', '</table></div>')
+  .replace(/href="([^"]*)"/g, (_, href: string) => {
+    const decoded = href.replaceAll('&amp;', '&');
+    let url = decoded;
+    if (doc.imported) url = resolveDocHref(decoded, doc.path, docs, link('docs'), source(''));
+    else if (!/^(?:[a-z]+:|\/|#)/i.test(decoded)) url = link('docs', decoded);
+    else if (decoded === 'https://models.guild.illatio.dev/') url = link('models');
+    return `href="${escapeAttr(url)}"`;
+  });
+const index = docs.findIndex((d) => d.slug === doc.slug);
+---
+
+<Shell
+  property="docs"
+  path={`${doc.slug}/`}
+  title={`${doc.title} — Guild Docs`}
+  description={`${doc.title}. ${doc.imported ? 'Complete Guild source document' : 'Practical Guild guide'} for Core ${revision.slice(0, 7)}.`}
+>
+  <div class="wrap docs-layout">
+    <DocsSidebar active={doc.slug} /><article class="docs-article">
+      <header>
+        <div class="eyebrow">{doc.category} / {revision.slice(0, 7)}</div><p>
+          {
+            doc.imported
+              ? 'Repository source · complete snapshot'
+              : 'Web guide · derived from pinned Core sources'
+          }
+        </p>{
+          doc.imported && (
+            <p class="source-line">
+              <>
+                <a href={source(doc.path)}>
+                  View {doc.path} at {revision.slice(0, 7)} ↗
+                </a>
+                <br />
+              </>
+              SHA-256 {doc.sha256}
+            </p>
+          )
+        }
+      </header>
+      {
+        doc.category === 'Performance archive' && (
+          <div class="notice" style="margin-bottom:30px">
+            <strong>Historical source report.</strong> This is the complete pinned document,
+            including its original validation claims. Successful full CUDA CTest, sanitizer,
+            sampling, and concurrent-session reruns for Phase 6.6.1 are not independently
+            established by the available website evidence. Read the{' '}
+            <a href={link('guild', 'performance/')}>measurement limitations</a> before quoting
+            results.
+          </div>
+        )
+      }
+      {
+        rendered.metadata.headings.filter((h) => h.depth === 2).length > 0 && (
+          <details class="toc">
+            <>
+              <summary>On this page</summary>
+              <ul>
+                {rendered.metadata.headings
+                  .filter((h) => h.depth === 2)
+                  .map((h) => (
+                    <li>
+                      <a href={`#${h.slug}`}>{h.text}</a>
+                    </li>
+                  ))}
+              </ul>
+            </>
+          </details>
+        )
+      }
+      <div class="markdown" set:html={html} /><nav
+        class="reading-nav"
+        aria-label="Adjacent chapters"
+      >
+        {
+          index > 0 ? (
+            <a href={link('docs', `${docs[index - 1].slug}/`)}>← {docs[index - 1].title}</a>
+          ) : (
+            <a href={link('docs')}>← All documentation</a>
+          )
+        }{
+          index < docs.length - 1 && (
+            <a href={link('docs', `${docs[index + 1].slug}/`)}>{docs[index + 1].title} →</a>
+          )
+        }
+      </nav>
+    </article>
+  </div>
+</Shell>

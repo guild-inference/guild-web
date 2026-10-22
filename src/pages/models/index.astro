@@ -1,0 +1,106 @@
+---
+import Shell from '../../layouts/Shell.astro';
+import { models } from '../../data/models';
+import { link } from '../../lib/links';
+import { revision, source } from '../../lib/source';
+---
+
+<Shell
+  property="models"
+  title="Guild Models — Compatibility, with context"
+  description="A source-backed Guild model catalog with explicit supported, experimental, planned, and research status. Actual registry metadata, upstream checks, and memory evidence."
+>
+  <section class="subhero wrap">
+    <div class="eyebrow">
+      <span class="dot"></span> Model catalog / Core {revision.slice(0, 7)}
+    </div><h1>Compatibility,<br /><em>with context.</em></h1><p class="lead">
+      Two built-in registry models. Clear boundaries around what runs, what is planned, and what is
+      still a research question.
+    </p><div class="notice">
+      Supported means Guild’s primary development target, not a guarantee for every quantization or
+      hardware configuration. Experimental entries have a development execution path. Planned
+      entries describe architecture work. Research entries have no released weights.
+    </div>
+  </section>
+  <section class="wrap section">
+    <div class="filter-row">
+      <label
+        >Search models<input
+          id="model-search"
+          type="search"
+          placeholder="Name, architecture, quantization…"
+        /></label
+      ><label
+        >Compatibility status<select id="model-stage"
+          ><option>All statuses</option>{
+            ['Supported', 'Experimental', 'Planned', 'Research'].map((s) => <option>{s}</option>)
+          }</select
+        ></label
+      >
+    </div><p id="model-count" role="status" class="small-note">{models.length} entries</p><div
+      class="model-grid"
+      style="margin-top:24px"
+    >
+      {
+        models.map((m) => (
+          <article
+            class="model-card"
+            data-model-card
+            data-stage={m.stage}
+            data-search={`${m.name} ${m.architecture} ${m.registry?.quantization || ''}`.toLowerCase()}
+          >
+            <>
+              <span class="status">
+                <span class="dot" />
+                {m.stage}
+                {m.registry ? ' / Registry model' : ' / Family'}
+              </span>
+              <h2>{m.name}</h2>
+              <p>{m.summary}</p>
+              <div class="model-meta">
+                <span>{m.architecture}</span>
+                {m.registry && (
+                  <>
+                    <span>{m.registry.quantization}</span>
+                    <span>
+                      {m.registry.activeExperts} / {m.registry.experts} experts active
+                    </span>
+                  </>
+                )}
+              </div>
+              <a class="text-link" href={link('models', `${m.id}/`)}>
+                View compatibility & sources <span aria-hidden="true">↗</span>
+              </a>
+            </>
+          </article>
+        ))
+      }
+    </div><p class="empty" id="model-empty" hidden>
+      No matching entries. Try a different search or status.
+    </p><p class="source-line">
+      Registry fields are extracted at build time from <a href={source('src/models/registry.cpp')}
+        >registry.cpp</a
+      >. Status follows the <a href={source('README.md')}>pinned README</a>. Hub metadata checked 22
+      October 2026.
+    </p>
+  </section>
+  <script>
+    const search = document.querySelector<HTMLInputElement>('#model-search')!;
+    const stage = document.querySelector<HTMLSelectElement>('#model-stage')!;
+    function filter() {
+      let count = 0;
+      document.querySelectorAll<HTMLElement>('[data-model-card]').forEach((card) => {
+        card.hidden = !(
+          card.dataset.search!.includes(search.value.trim().toLowerCase()) &&
+          (stage.value === 'All statuses' || card.dataset.stage === stage.value)
+        );
+        if (!card.hidden) count++;
+      });
+      document.querySelector('#model-count')!.textContent =
+        `${count} ${count === 1 ? 'entry' : 'entries'}`;
+      document.querySelector<HTMLElement>('#model-empty')!.hidden = count > 0;
+    }
+    search.addEventListener('input', filter);
+    stage.addEventListener('change', filter);
+  </script>
+</Shell>

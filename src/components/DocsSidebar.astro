@@ -1,0 +1,100 @@
+---
+import { docs, categories } from '../lib/docs';
+import { asset, link } from '../lib/links';
+interface Props {
+  active?: string;
+}
+const { active } = Astro.props;
+---
+
+<aside class="docs-side" aria-label="Documentation navigation">
+  <label for="docs-search" class="section-label">Search the documentation</label>
+  <input
+    id="docs-search"
+    class="docs-search"
+    type="search"
+    placeholder="Architecture, CLI, GPACK…"
+    data-index={asset('search-index.json')}
+  />
+  <div id="search-state" class="small-note" role="status" aria-live="polite"></div>
+  <div id="search-results" class="docs-search-results"></div>
+  <details class="docs-chapters" open>
+    <summary>Browse chapters <span aria-hidden="true">+</span></summary>
+    <nav aria-label="Documentation chapters">
+      {
+        categories.map((category) => (
+          <section>
+            <h2>{category}</h2>
+            {docs
+              .filter((d) => d.category === category)
+              .map((d) => (
+                <a
+                  href={link('docs', `${d.slug}/`)}
+                  aria-current={d.slug === active ? 'page' : undefined}
+                >
+                  {d.title}
+                </a>
+              ))}
+          </section>
+        ))
+      }
+    </nav>
+  </details>
+</aside>
+<script>
+  const chapters = document.querySelector<HTMLDetailsElement>('.docs-chapters')!;
+  const mobile = window.matchMedia('(max-width: 760px)');
+  chapters.open = !mobile.matches;
+  mobile.addEventListener('change', () => {
+    chapters.open = !mobile.matches;
+  });
+  type SearchDoc = { title: string; text: string; url: string };
+  const input = document.querySelector<HTMLInputElement>('#docs-search')!;
+  const results = document.querySelector('#search-results')!;
+  const status = document.querySelector('#search-state')!;
+  let index: Promise<SearchDoc[]> | undefined;
+  let sequence = 0;
+  input.addEventListener('input', async () => {
+    const request = ++sequence;
+    const q = input.value.trim().toLowerCase();
+    results.replaceChildren();
+    if (!q) {
+      status.textContent = '';
+      return;
+    }
+    status.textContent = 'Searching…';
+    try {
+      index ||= fetch(input.dataset.index!).then((r) => {
+        if (!r.ok) throw new Error('Search unavailable');
+        return r.json();
+      });
+      const entries = await index;
+      if (request !== sequence) return;
+      const words = q.split(/\s+/);
+      const hits = entries
+        .filter((d) => words.every((word) => `${d.title} ${d.text}`.toLowerCase().includes(word)))
+        .sort(
+          (a, b) =>
+            Number(b.title.toLowerCase().includes(q)) - Number(a.title.toLowerCase().includes(q)),
+        );
+      status.textContent = hits.length
+        ? `${hits.length} result${hits.length === 1 ? '' : 's'}`
+        : 'No results. Try a model format or command.';
+      for (const hit of hits.slice(0, 12)) {
+        const a = document.createElement('a');
+        a.href = hit.url;
+        a.textContent = hit.title;
+        const excerpt = document.createElement('small');
+        const start = Math.max(0, hit.text.toLowerCase().indexOf(words[0]) - 45);
+        excerpt.textContent = `${start ? '…' : ''}${hit.text.slice(start, start + 150)}…`;
+        a.append(excerpt);
+        results.append(a);
+      }
+    } catch {
+      if (request === sequence) {
+        status.textContent = 'Search could not load. Use the chapters below.';
+        index = undefined;
+      }
+    }
+  });
+</script>

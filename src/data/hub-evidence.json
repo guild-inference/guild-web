@@ -1,0 +1,17 @@
+{
+  "checked": "2026-10-22",
+  "method": "hf models info <repository> --format json (metadata only; no weight download)",
+  "qwen": {
+    "repository": "unsloth/Qwen3.8-Flash-Next-GGUF",
+    "revision": "766911a6b7369840a91dbcd95f9f997acaab6cd6",
+    "ggufTotalParameters": 176943899520,
+    "architecture": "qwen4exp",
+    "contextLength": 262144,
+    "available": true
+  },
+  "ornith": {
+    "repository": "ukisai/Ornith-1.5-35B-GGUF",
+    "available": false,
+    "result": "Model not found via the available Hub CLI. No public download availability or upstream parameter count verified."
+  }
+}

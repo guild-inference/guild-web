@@ -1,0 +1,21 @@
+---
+import Shell from '../layouts/Shell.astro';
+import { link } from '../lib/links';
+---
+
+<Shell
+  property="guild"
+  title="Page not found — Guild"
+  description="Return to Guild or search its documentation."
+  noindex
+  ><section class="subhero wrap">
+    <div class="eyebrow">404 / Page not found</div><h1>
+      Let’s find<br /><em>another path.</em>
+    </h1><div class="actions">
+      <a class="button" href={link('docs')}>Search documentation ↗</a><a
+        class="text-link"
+        href={link('guild')}>Guild home ↗</a
+      >
+    </div>
+  </section></Shell
+>

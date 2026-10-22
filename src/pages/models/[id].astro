@@ -1,0 +1,152 @@
+---
+import Shell from '../../layouts/Shell.astro';
+import { models } from '../../data/models';
+import { link } from '../../lib/links';
+import { source, revision } from '../../lib/source';
+export function getStaticPaths() {
+  return models.map((model) => ({ params: { id: model.id }, props: { model } }));
+}
+const { model: m } = Astro.props;
+const r = m.registry;
+---
+
+<Shell
+  property="models"
+  path={`${m.id}/`}
+  title={`${m.name} — Guild model compatibility`}
+  description={m.summary}
+>
+  <section class="subhero wrap">
+    <a class="text-link" href={link('models')}>← Model catalog</a><div
+      class="eyebrow"
+      style="margin-top:35px"
+    >
+      {m.stage} / {r ? 'Registry model' : 'Family'}
+    </div><h1>{m.name}</h1><p class="lead">{m.summary}</p>
+  </section><section class="section wrap">
+    <div class="grid-two">
+      <div>
+        <span class="section-label">01 / Specification & evidence</span><dl class="spec-grid">
+          <div><dt>Architecture</dt><dd>{m.architecture}</dd></div><div>
+            <dt>Parameter count</dt><dd>{m.parameters}</dd>
+          </div><div><dt>Active parameters</dt><dd>{m.activeParameters}</dd></div><div>
+            <dt>Formats</dt><dd>
+              {
+                r
+                  ? 'GGUF input · GPACK container · optional GEXEC cache'
+                  : 'No validated model artifact'
+              }
+            </dd>
+          </div>{
+            r && (
+              <>
+                <>
+                  <div>
+                    <>
+                      <dt>Registry quantization</dt>
+                      <dd>{r.quantization}</dd>
+                    </>
+                  </div>
+                  <div>
+                    <>
+                      <dt>Registry size on disk</dt>
+                      <dd>
+                        {(r.bytes / 2 ** 30).toFixed(2)} GiB ({r.bytes.toLocaleString('en-US')}{' '}
+                        bytes)
+                      </dd>
+                    </>
+                  </div>
+                  <div>
+                    <>
+                      <dt>Layers / routed experts</dt>
+                      <dd>
+                        {r.layers} layers · {r.activeExperts} of {r.experts} experts active per
+                        layer
+                      </dd>
+                    </>
+                  </div>
+                  <div>
+                    <>
+                      <dt>Context metadata</dt>
+                      <dd>{r.context.toLocaleString('en-US')} tokens — see runtime limits below</dd>
+                    </>
+                  </div>
+                </>
+              </>
+            )
+          }
+        </dl><p class="source-line">
+          Guild snapshot <a href={source('README.md')}>{revision.slice(0, 7)}</a>. Unknown fields
+          are left unverified rather than estimated.
+        </p>
+      </div><div>
+        <div class="paper">
+          <h2 style="font-size:2.3rem">Availability</h2><p>{m.availability}</p>{
+            m.upstream && (
+              <a class="text-link" style="margin-top:20px" href={m.upstream}>
+                Verified upstream revision ↗
+              </a>
+            )
+          }{
+            r && m.upstream && (
+              <div class="code-box">
+                <>
+                  <div class="code-label">
+                    <>
+                      <span>Registry command</span>
+                      <button type="button" data-copy="pull-code">
+                        Copy
+                      </button>
+                    </>
+                  </div>
+                  <pre tabindex="0">
+                    <code id="pull-code">{`guild pull ${r.name}`}</code>
+                  </pre>
+                </>
+              </div>
+            )
+          }{
+            m.id === 'eon' && (
+              <a class="text-link" href={link('labs')}>
+                Visit Guild Labs ↗
+              </a>
+            )
+          }
+        </div><div class="notice">
+          <strong>Memory evidence</strong><p style="margin-top:10px">{m.memory}</p>{
+            r && (
+              <p style="margin-top:10px">
+                Measured host: 2× Xeon Gold 6130, 376 GiB RAM, GTX 1070 8 GiB. System-RAM
+                requirements are not established by sampled VRAM. Context, KV, and workspace choices
+                matter. <a href={link('docs', 'hardware/')}>Read hardware guidance ↗</a>
+              </p>
+            )
+          }
+        </div>
+      </div>
+    </div><div class="prose" style="margin-top:45px">
+      <h2>Compatibility notes</h2><ul>
+        {m.notes.map((note) => <li style="margin-bottom:14px;color:var(--muted)">{note}</li>)}
+      </ul><div class="actions">
+        {
+          r ? (
+            <>
+              <>
+                <a class="text-link" href={source('src/models/registry.cpp')}>
+                  Registry source ↗
+                </a>
+                <a class="text-link" href={link('docs', 'phase6/')}>
+                  Memory measurements ↗
+                </a>
+              </>
+            </>
+          ) : m.stage === 'Planned' ? (
+            <a class="text-link" href={source('src/model/archetype.cpp')}>
+              Archetype source ↗
+            </a>
+          ) : null
+        }
+      </div>
+    </div>
+  </section>
+</Shell>
