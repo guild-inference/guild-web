@@ -1,55 +1,39 @@
-# Deployment & Nested Subdomain TLS Architecture
+# Cloudflare Worker & Nested Subdomain TLS Deployment
 
-## 1. Domain Hierarchy
+## 1. Host-Aware Cloudflare Worker Architecture (`worker.mjs` + `wrangler.toml`)
 
-`guild-web` serves the Guild inference engine and its nested documentation and model catalog subdomains:
+`guild-web` is packaged as a **Cloudflare Worker with Static Assets** (`wrangler.toml` `main = "worker.mjs"`, `[assets] directory = "./dist"`). A single Worker deployment serves all three Guild properties based on the incoming request hostname (or `?domain=docs|models` query override on `*.workers.dev`):
 
-| Property            | Canonical Domain                   | Preview Path | Package Target                   |
-| ------------------- | ---------------------------------- | ------------ | -------------------------------- |
-| Guild Engine        | `https://guild.illatio.dev`        | `/`          | `npm run package:site -- guild`  |
-| Guild Documentation | `https://docs.guild.illatio.dev`   | `/docs/`     | `npm run package:site -- docs`   |
-| Guild Model Catalog | `https://models.guild.illatio.dev` | `/models/`   | `npm run package:site -- models` |
+| Property     | Canonical Custom Domain            | Worker Route Resolution (`worker.mjs`)                                   |
+| ------------ | ---------------------------------- | ------------------------------------------------------------------------ |
+| Guild Engine | `https://guild.illatio.dev`        | `/` → `dist/index.html`, `/performance/` → `dist/performance/index.html` |
+| Guild Docs   | `https://docs.guild.illatio.dev`   | `/` → `dist/docs/index.html`, `/:slug/` → `dist/docs/:slug/index.html`   |
+| Guild Models | `https://models.guild.illatio.dev` | `/` → `dist/models/index.html`, `/:id/` → `dist/models/:id/index.html`   |
 
-## 2. TLS Coverage for Nested Subdomains (`*.guild.illatio.dev`)
+## 2. Deploying the Cloudflare Worker
 
-Per RFC 6125, a standard wildcard certificate for `*.illatio.dev` covers single-label subdomains (`guild.illatio.dev`, `labs.illatio.dev`, `cloud.illatio.dev`), but **does not cover nested second-level subdomains** (`docs.guild.illatio.dev` and `models.guild.illatio.dev`).
-
-To serve `docs.guild.illatio.dev` and `models.guild.illatio.dev` over HTTPS:
-
-1. **Cloudflare Edge Certificate**:
-   - When attaching `docs.guild.illatio.dev` and `models.guild.illatio.dev` as custom domains to their Cloudflare Pages projects, Cloudflare issues dedicated per-hostname edge certificates, or you can enable **Cloudflare Advanced Certificate Manager (ACM)** with a certificate covering `guild.illatio.dev` and `*.guild.illatio.dev`.
-2. **Origin TLS (if using Nginx behind Cloudflare Full Strict)**:
-   - Issue a Cloudflare Origin CA or Let's Encrypt certificate that explicitly includes SANs for `guild.illatio.dev` and `*.guild.illatio.dev` (`docs.guild.illatio.dev`, `models.guild.illatio.dev`).
-3. **Path-Based Routing Always Works**:
-   - In addition to dedicated subdomains, `guild.illatio.dev/docs/` and `guild.illatio.dev/models/` are pre-rendered in the main `guild` bundle and work immediately under standard first-level TLS (`guild.illatio.dev`).
-
-## 3. Reproducible Cloudflare Pages Deployment
+### Option A: CLI Deployment (`npm run deploy:worker`)
 
 ```bash
-# Authenticate Wrangler
+# 1. Authenticate Wrangler (or export CLOUDFLARE_API_TOKEN with Workers Scripts:Edit permission)
 npx wrangler login
 
-# Verify pinned Guild Core sources and build with production canonical URLs
-npm run check:sources
-PUBLIC_DEPLOYMENT=production npm run build
-
-# 1. Deploy guild.illatio.dev (also includes /docs/ and /models/ paths)
-npm run package:site -- guild
-npx wrangler pages deploy dist-site --project-name guild-web --branch main
-
-# 2. Deploy docs.guild.illatio.dev
-npm run package:site -- docs
-npx wrangler pages deploy dist-site --project-name guild-docs --branch main
-
-# 3. Deploy models.guild.illatio.dev
-npm run package:site -- models
-npx wrangler pages deploy dist-site --project-name guild-models --branch main
+# 2. Build production bundle and deploy the Worker + Static Assets
+npm run deploy:worker
 ```
 
-## 4. Persistent GitHub Pages Preview
+### Option B: Cloudflare Workers Builds (Git Integration)
 
-On every push to `main`, `.github/workflows/ci.yml` verifies source hashes, linting, formatting, Astro types, broken links/anchors, and headless Chromium Playwright + axe-core tests across `1440px`, `390px`, and `320px` viewports, then publishes a live preview to:
+1. In the Cloudflare dashboard, open **Workers & Pages → Create application → Workers → Import a repository**.
+2. Select **`guild-inference/guild-web`**.
+3. Set Build command: `PUBLIC_DEPLOYMENT=production npm run build`
+4. Set Deploy command: `npx wrangler deploy`
+5. Under **Settings → Domains & Routes**, attach Custom Domains:
+   - `guild.illatio.dev`
+   - `docs.guild.illatio.dev`
+   - `models.guild.illatio.dev`
+     _(Attaching a **Custom Domain** directly to a Cloudflare Worker automatically provisions a dedicated edge certificate for that exact hostname, including nested second-level subdomains `docs.guild.illatio.dev` and `models.guild.illatio.dev`!)_
 
-- **https://guild-inference.github.io/guild-web/**
-- **https://guild-inference.github.io/guild-web/docs/**
-- **https://guild-inference.github.io/guild-web/models/**
+### Option C: GitHub Actions Automated Worker Deployment
+
+`.github/workflows/ci.yml` includes a `deploy-worker` job that validates `npx wrangler deploy --dry-run` on every push to `main` and automatically runs `npx wrangler deploy` once `CLOUDFLARE_API_TOKEN` (and optionally `CLOUDFLARE_ACCOUNT_ID`) is added to the repository or `guild-inference` organization secrets.
