@@ -31,6 +31,7 @@ for (const width of [1440, 390, 320])
       await page.screenshot({ path: info.outputPath('page.png'), fullPage: true });
     });
   }
+
 test('catalog filters, empty results, and durable detail links', async ({ page }) => {
   await page.goto('/models/');
   await page.getByLabel('Compatibility status').selectOption('Research');
@@ -42,6 +43,7 @@ test('catalog filters, empty results, and durable detail links', async ({ page }
   await page.getByLabel('Search models').fill('not-a-model');
   await expect(page.locator('#model-empty')).toBeVisible();
 });
+
 test('docs full text search, deep links, and complete long documents', async ({ page }) => {
   await page.goto('/docs/');
   await page.getByLabel('Search the documentation').fill('atomic');
@@ -54,10 +56,18 @@ test('docs full text search, deep links, and complete long documents', async ({ 
   await page.locator('.markdown a').filter({ hasText: 'GPACK_FORMAT.md' }).first().click();
   await expect(page).toHaveURL(/\/docs\/gpack\/$/);
 });
-test('routing illustration and clipboard feedback work', async ({ page, context }) => {
+
+test('routing illustration, token stepping, pulse animation, and clipboard feedback work', async ({
+  page,
+  context,
+}) => {
   await page.goto('/');
+  await page.getByRole('button', { name: 'Send a token pulse' }).click();
+  await expect(page.locator('[data-field-card]')).toHaveClass(/is-pulsing/);
   await page.getByRole('button', { name: 'Qwen · 10 / 512' }).click();
   await expect(page.locator('#route-caption')).toContainText('10 of 512');
+  await page.getByRole('button', { name: /Step next token/ }).click();
+  await expect(page.locator('.network-grid i.on').first()).toBeVisible();
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto('/models/qwen3-8-flash-next/');
   await page.getByRole('button', { name: 'Copy', exact: true }).click();
