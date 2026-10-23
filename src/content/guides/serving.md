@@ -28,6 +28,6 @@ Keep the service bound to `127.0.0.1` during local use. Do not expose it beyond 
 
 ## Cloud status
 
-Illatio Cloud is a separate, planned hosted product. The local server command does not create a Cloud account or provision a hosted endpoint.
+Our hosted cloud platform under The Guild Inference Project is a separate, planned product. The local server command does not create a cloud account or provision a hosted endpoint.
 
 Sources: [repository README](repository-readme/), [architecture](architecture/), and [correctness recovery](troubleshooting/).
