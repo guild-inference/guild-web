@@ -30,7 +30,7 @@ Formatting: `npm run format` / `npm run format:check`.
 
 Astro pre-renders complete HTML. Lightweight scripts power full-text documentation search, model filters, clipboard feedback and the engine page's views. The engine page (`/`) is laid out like the tool itself: a sidebar, a status bar, and inspect, plan, decode and serve views built only from the pinned registry and the Phase 6 and 6.6.1 measurements; scroll fills the measured machine as the placement plan proceeds, and the page ends on a command lookup that describes documented commands without running anything. Docs, models and performance share the same identity (Archivo, Geist, graphite with a pale green) without scroll effects. Scroll behaviour comes from the vendored scrollcraft engine in `src/vendor/scrollcraft/` (unmodified). Each model and document has a durable URL, canonical metadata, and real links. Documentation includes GFM tables, highlighted code, rendered equations, heading navigation, and previous/next chapters. Fonts are self-hosted. Reading and core navigation work without JavaScript.
 
-Six web guides accompany **19 complete repository documents**. There are two actual registry models plus three planned architecture families and the Eon research proposal. Planned/research entries have no fabricated specs, download buttons, or fit estimates.
+Six web guides accompany **19 complete repository documents**, pinned to the Guild release `v0.2.0-preview.3`. There are two actual registry models, three planned architecture families and the three Guild Labs research models (Apprentice, Journeyman, Magistrate). Planned and research entries have no fabricated specs, download buttons or fit estimates.
 
 ## Version-aware documentation
 

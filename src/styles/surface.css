@@ -31,13 +31,11 @@
   font-size: var(--sc-t-xs);
   color: var(--sc-ink-soft);
 }
-.rail__views,
-.rail__site {
+.rail__views {
   display: grid;
   gap: 2px;
 }
-.rail__views a,
-.rail__site a {
+.rail__views a {
   padding: 0.38rem var(--sc-3);
   border-radius: var(--sc-r-sm);
   color: var(--sc-ink-soft);
@@ -46,8 +44,7 @@
     background-color var(--sc-d-fast) var(--sc-ease-out),
     color var(--sc-d-fast) var(--sc-ease-out);
 }
-.rail__views a:hover,
-.rail__site a:hover {
+.rail__views a:hover {
   color: var(--sc-ink);
   background: var(--sc-surface);
 }
@@ -55,15 +52,6 @@
   color: var(--sc-ink);
   background: var(--sc-surface);
   box-shadow: inset 2px 0 0 var(--sc-accent);
-}
-.rail__site {
-  padding-top: var(--sc-5);
-  border-top: 1px solid var(--sc-hairline);
-}
-.rail__home {
-  margin-top: auto;
-  font-size: var(--sc-t-xs);
-  color: var(--sc-ink-soft);
 }
 
 /* ---------------------------------------------------------------- status -- */
@@ -126,7 +114,7 @@
 
 /* inspect */
 .inspect {
-  min-height: calc(100svh - 2rem);
+  min-height: calc(100svh - 5rem);
   display: grid;
   align-content: center;
   gap: var(--sc-7);
@@ -148,9 +136,25 @@
   line-height: 0.94;
   letter-spacing: -0.045em;
 }
+/* The run's RAM is part of the headline, not a footnote. */
+.inspect__ram {
+  max-width: 44ch;
+  margin: var(--sc-4) 0 0;
+  font-family: var(--sc-font-display);
+  font-weight: 600;
+  font-stretch: 92%;
+  font-size: var(--sc-t-xl);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--sc-ink);
+}
+.inspect__ram b {
+  color: var(--sc-accent);
+  font-weight: 700;
+}
 .inspect__lede {
   max-width: 44ch;
-  margin: var(--sc-5) 0 0;
+  margin: var(--sc-4) 0 0;
   font-size: var(--sc-t-lg);
   line-height: 1.45;
   color: var(--sc-ink-soft);
@@ -203,9 +207,18 @@
   font-family: var(--sc-font-display);
   font-weight: 650;
   font-stretch: 92%;
-  font-size: var(--sc-t-xl);
+  font-size: var(--sc-t-lg);
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
+}
+/* Identifiers are read exactly, so they never break mid-word. */
+.readout dd code {
+  padding: 0 !important;
+  background: none !important;
+  font-size: var(--sc-t-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow-wrap: normal;
 }
 .layers {
   margin: 0;
@@ -494,7 +507,50 @@
   color: var(--sc-ink);
 }
 
+/* desktop: the measurement that does not exist yet */
+.desktop__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sc-4) var(--sc-7);
+  max-width: 68rem;
+  margin-top: var(--sc-5);
+}
+.desktop__grid p {
+  margin: 0;
+  color: var(--sc-ink-soft);
+}
+.desktop__grid a {
+  color: var(--sc-ink);
+}
+.desktop__grid .todo {
+  grid-column: 1 / -1;
+}
+
 /* serve: the page ends on an input */
+.serve__code {
+  display: grid;
+  gap: var(--sc-4);
+  min-width: 0;
+}
+.serve__code .code-box {
+  margin-top: 0;
+}
+.routes {
+  margin: 0;
+  border-top: 1px solid var(--sc-hairline);
+}
+.routes div {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  gap: var(--sc-3);
+  padding: var(--sc-2) 0;
+  border-bottom: 1px solid var(--sc-hairline);
+  font-size: var(--sc-t-sm);
+}
+.routes dd {
+  margin: 0;
+  color: var(--sc-ink-soft);
+}
 .serve {
   border-bottom: 0;
 }
@@ -585,16 +641,9 @@
   font-size: var(--sc-t-sm);
   color: var(--sc-ink-soft);
 }
-.serve__foot {
-  margin-top: var(--sc-10);
-  font-size: var(--sc-t-xs);
-  color: var(--sc-ink-soft);
-}
-.serve__foot > p {
-  margin: var(--sc-5) 0 0;
-}
-.serve__foot > p a {
-  color: var(--sc-ink);
+/* Keep the shared footer clear of the fixed status bar. */
+.site-guild .gfoot {
+  padding-bottom: 2rem;
 }
 
 /* ---------------------------------------------------------------- phones -- */
@@ -623,9 +672,7 @@
     overflow-x: auto;
     scrollbar-width: none;
   }
-  .rail__sub,
-  .rail__site,
-  .rail__home {
+  .rail__sub {
     display: none;
   }
   .rail__views {
@@ -694,6 +741,13 @@
     gap: var(--sc-3);
   }
   .lookup__list li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+  .desktop__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .routes div {
     grid-template-columns: minmax(0, 1fr);
     gap: 2px;
   }

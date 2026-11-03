@@ -2,7 +2,7 @@
 import Site from '../../layouts/Site.astro';
 import { models } from '../../data/models';
 import { link } from '../../lib/links';
-import { revision, source } from '../../lib/source';
+import { pinned, source } from '../../lib/source';
 ---
 
 <Site
@@ -13,7 +13,7 @@ import { revision, source } from '../../lib/source';
 >
   <div class="page">
     <header class="head">
-      <p class="head__meta">Model catalog · Core {revision.slice(0, 7)}</p>
+      <p class="head__meta">Model catalog · Guild {pinned}</p>
       <h1>Compatibility, with context.</h1>
       <p class="head__lede">
         Two built-in registry models, and clear boundaries around what runs, what is planned and
@@ -50,7 +50,7 @@ import { revision, source } from '../../lib/source';
             class="entry"
             data-model-card
             data-stage={m.stage}
-            data-search={`${m.name} ${m.architecture} ${m.registry?.quantization || ''}`.toLowerCase()}
+            data-search={`${m.name} ${m.modelId ?? ''} ${m.architecture} ${m.type} ${m.registry?.quantization || ''}`.toLowerCase()}
           >
             <div>
               <h2>{m.name}</h2>
@@ -61,7 +61,17 @@ import { revision, source } from '../../lib/source';
             <div>
               <p>{m.summary}</p>
               <ul class="entry__facts">
-                <li>{m.architecture}</li>
+                <li>
+                  <span class="k">type</span> {m.type}
+                </li>
+                {m.modelId && (
+                  <li>
+                    <span class="k">model id</span> {m.modelId}
+                  </li>
+                )}
+                <li>
+                  <span class="k">arch</span> {m.architecture}
+                </li>
                 {m.registry && <li>{m.registry.quantization}</li>}
                 {m.registry && (
                   <li>

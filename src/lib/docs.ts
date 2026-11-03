@@ -10,11 +10,19 @@ export const docs = [
     ...g,
     path: '',
     sha256: '',
+    subtitle: '',
     markdown: String(guideFiles[`../content/guides/${g.file}`]),
     imported: false,
   })),
   ...snapshot.documents
     .filter((d) => 'slug' in d)
-    .map((d) => ({ ...d, slug: d.slug!, title: d.title!, category: d.category!, imported: true })),
+    .map((d) => ({
+      ...d,
+      slug: d.slug!,
+      title: d.title!,
+      category: d.category!,
+      subtitle: 'subtitle' in d ? String(d.subtitle) : '',
+      imported: true,
+    })),
 ];
 export const categories = [...new Set(docs.map((d) => d.category))];

@@ -1,6 +1,35 @@
 # Build for your hardware
 
-Guild currently builds from source. You need Git, CMake, a C++ toolchain, and the toolkit for the GPU backend you select. Backend packages are pinned by Guild's build configuration; use the source instructions for the revision you build.
+## Install the pinned release
+
+Guild v0.2.0-preview.3 ships prebuilt Linux and Windows binaries with a one-command installer. It is a development preview. The installer detects your CPU and NVIDIA GPU, picks a build, and checks the archive's SHA-256 against the release before installing into your user account.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/guild-inference/Guild/v0.2.0-preview.3/install.sh | GUILD_VERSION=v0.2.0-preview.3 bash
+```
+
+Or download the installer, check it, read it, then run it:
+
+```bash
+curl -fsSLO https://raw.githubusercontent.com/guild-inference/Guild/v0.2.0-preview.3/install.sh
+echo "1c596ad770713eed7c2e3a5df72f9cde30880371eb3b357263a7f2a1d7527095  install.sh" | sha256sum -c
+less install.sh
+GUILD_VERSION=v0.2.0-preview.3 bash install.sh
+```
+
+On Windows PowerShell, the same steps with `install.ps1`, whose SHA-256 at this release is `17e0735a50966525e4681e2d833e6b0bb138a6637385f91634450aa8af3e80aa`:
+
+```powershell
+Invoke-WebRequest https://raw.githubusercontent.com/guild-inference/Guild/v0.2.0-preview.3/install.ps1 -OutFile install.ps1
+(Get-FileHash install.ps1 -Algorithm SHA256).Hash
+$env:GUILD_VERSION = "v0.2.0-preview.3"; .\install.ps1
+```
+
+`GUILD_VERSION` pins the binary to this release; without it the installer fetches the latest preview.
+
+## Build from source
+
+You need Git, CMake, a C++ toolchain, and the toolkit for the GPU backend you select. Backend packages are pinned by Guild's build configuration; use the source instructions for the revision you build.
 
 ## NVIDIA / CUDA
 

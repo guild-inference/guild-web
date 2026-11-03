@@ -2,7 +2,7 @@
 import Site from '../../layouts/Site.astro';
 import DocsSidebar from '../../components/DocsSidebar.astro';
 import { link } from '../../lib/links';
-import { revision, source } from '../../lib/source';
+import { pinned, source } from '../../lib/source';
 import { docs } from '../../lib/docs';
 const start = [
   ['getting-started', 'Your first run', 'Clone, build, choose a model and generate locally.'],
@@ -10,7 +10,7 @@ const start = [
   ['hardware', 'Plan the memory', 'GPU memory, host RAM, KV cache and file-backed experts.'],
   ['cli', 'Use the CLI', 'The model store, inference, serving and execution artifacts.'],
   ['formats', 'Understand the formats', 'GGUF, the portable GPACK and the machine-specific GEXEC.'],
-  ['serving', 'Serve locally', 'The OpenAI-compatible server and the Python server.'],
+  ['serving', 'Serve locally', 'The OpenAI-compatible server, its port, and the Python server.'],
 ];
 const imported = docs.filter((d) => d.imported).length;
 ---
@@ -25,7 +25,7 @@ const imported = docs.filter((d) => d.imported).length;
     <DocsSidebar />
     <article class="article">
       <header class="head">
-        <p class="head__meta">Documentation · Core {revision.slice(0, 7)}</p>
+        <p class="head__meta">Documentation · Guild {pinned}</p>
         <h1>Understand the engine. Make it yours.</h1>
         <p class="head__lede">
           Start with a local run, then go deeper into the memory planner, the model formats and the
@@ -44,9 +44,9 @@ const imported = docs.filter((d) => d.imported).length;
       </nav>
       <div class="note">
         <strong>A versioned reading room.</strong> Six web guides accompany {imported} complete repository
-        documents. Imported documents are pinned to
-        <a href={source('README.md')}>{revision.slice(0, 7)}</a>, with file hashes and source links.
-        Updating Core does not silently rewrite this snapshot.
+        documents. Imported documents are pinned to the release
+        <a href={source('README.md')}>{pinned}</a>, with file hashes and source links. Updating Core
+        does not silently rewrite this snapshot.
       </div>
       <p class="links">
         <a href={link('guild', 'performance/')}>Read the performance evidence notes</a>

@@ -2,7 +2,7 @@
 import Site from '../../layouts/Site.astro';
 import { models } from '../../data/models';
 import { link } from '../../lib/links';
-import { source, revision } from '../../lib/source';
+import { source, pinned } from '../../lib/source';
 export function getStaticPaths() {
   return models.map((model) => ({ params: { id: model.id }, props: { model } }));
 }
@@ -29,7 +29,20 @@ const r = m.registry;
     <div class="spec">
       <div>
         <dl class="labels">
-          <div><dt>Architecture</dt><dd>{m.architecture}</dd></div>
+          <div><dt>Display name</dt><dd>{m.name}</dd></div>
+          {
+            m.modelId && (
+              <div>
+                <dt>Model id</dt>
+                <dd>
+                  <code>{m.modelId}</code> (use this in <code>guild</code> commands and API
+                  requests)
+                </dd>
+              </div>
+            )
+          }
+          <div><dt>Architecture tag</dt><dd><code>{m.architecture}</code></dd></div>
+          <div><dt>Type</dt><dd>{m.type}</dd></div>
           <div><dt>Parameter count</dt><dd>{m.parameters}</dd></div>
           <div><dt>Active parameters</dt><dd>{m.activeParameters}</dd></div>
           <div>
@@ -69,8 +82,8 @@ const r = m.registry;
           }
         </dl>
         <p class="source-line">
-          Guild snapshot <a href={source('README.md')}>{revision.slice(0, 7)}</a>. Unknown fields
-          are left unverified rather than estimated.
+          Guild <a href={source('README.md')}>{pinned}</a>. Unknown fields are left unverified
+          rather than estimated.
         </p>
       </div>
       <div>
@@ -100,7 +113,7 @@ const r = m.registry;
             )
           }
           {
-            m.id === 'eon' && (
+            m.stage === 'Research' && (
               <p>
                 <a href={link('labs')}>Visit Guild Labs ↗</a>
               </p>

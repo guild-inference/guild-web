@@ -1,18 +1,17 @@
-/* Guild identity: graphite with a pale signal green, Archivo and Geist. Shared by every Guild page. */
+/* Guild: the shared dark neutrals from base.css, with this site's pale signal green as its accent. */
 .site {
-  --sc-canvas: #0e110f;
-  --sc-surface: #151a17;
-  --sc-ink: #e8ece6;
-  --sc-ink-soft: #9ca89f;
   --sc-accent: #a6e39a;
   --sc-accent-ink: #0b1a0c;
-  --raise: #1b211d;
-  --sc-hairline: color-mix(in oklab, #e8ece6 12%, transparent);
-  --sc-hairline-strong: color-mix(in oklab, #e8ece6 22%, transparent);
-  --sc-edge: inset 0 1px 0 color-mix(in oklab, #e8ece6 8%, transparent);
-  --sc-shadow-color: 140 20% 2%;
   --warn: #f0b36a;
   --sc-maxw: 84rem;
+}
+/* Values the owner still has to supply or measure are shown, not guessed. */
+.todo {
+  display: inline-block;
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  letter-spacing: 0.04em;
+  color: var(--warn);
 }
 .site h1,
 .site h2,
@@ -39,108 +38,6 @@
 }
 .site a:hover {
   text-decoration-color: currentColor;
-}
-
-/* --------------------------------------------------------------- app bar -- */
-.appbar {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  gap: var(--sc-6);
-  height: 3.5rem;
-  padding: 0 var(--sc-gutter);
-  background: color-mix(in oklab, var(--sc-canvas) 92%, transparent);
-  border-bottom: 1px solid var(--sc-hairline);
-  backdrop-filter: blur(10px);
-}
-.appbar__mark {
-  font-family: var(--sc-font-display);
-  font-weight: 750;
-  font-size: var(--sc-t-lg);
-  letter-spacing: -0.03em;
-  text-decoration: none;
-}
-.appbar__tabs {
-  display: flex;
-  align-self: stretch;
-  gap: var(--sc-1);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.appbar__tabs a {
-  display: flex;
-  align-items: center;
-  padding: 0 var(--sc-3);
-  font-size: var(--sc-t-sm);
-  color: var(--sc-ink-soft);
-  text-decoration: none;
-  white-space: nowrap;
-  border-bottom: 2px solid transparent;
-  transition: color var(--sc-d-fast) var(--sc-ease-out);
-}
-.appbar__tabs a:hover {
-  color: var(--sc-ink);
-}
-.appbar__tabs a[aria-current='page'] {
-  color: var(--sc-ink);
-  border-bottom-color: var(--sc-accent);
-}
-.appbar__src {
-  margin-left: auto;
-  font-size: var(--sc-t-sm);
-  color: var(--sc-ink-soft);
-  text-decoration: none;
-  white-space: nowrap;
-}
-.appbar__src:hover {
-  color: var(--sc-ink);
-}
-
-/* ---------------------------------------------------------------- footer -- */
-.sitefoot {
-  max-width: var(--sc-maxw);
-  margin: var(--sc-10) auto 0;
-  padding: 0 var(--sc-gutter) var(--sc-7);
-  font-size: var(--sc-t-xs);
-  color: var(--sc-ink-soft);
-}
-.sitefoot > p {
-  margin: var(--sc-5) 0 0;
-}
-.sitefoot > p a {
-  color: var(--sc-ink);
-}
-.eco ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  border-top: 1px solid var(--sc-hairline);
-}
-.eco li {
-  border-bottom: 1px solid var(--sc-hairline);
-}
-.eco a {
-  display: grid;
-  gap: 2px;
-  padding: var(--sc-4) var(--sc-3) var(--sc-4) 0;
-  text-decoration: none;
-}
-.eco__name {
-  font-weight: 600;
-  font-size: var(--sc-t-sm);
-  color: var(--sc-ink);
-}
-.eco__domain {
-  font-family: var(--sc-font-mono);
-  font-size: var(--sc-t-xs);
-  overflow-wrap: anywhere;
-}
-.eco a:hover .eco__name {
-  color: var(--sc-accent);
 }
 
 /* ------------------------------------------------------------ page heads -- */
@@ -223,9 +120,9 @@
 }
 .docs-side {
   position: sticky;
-  top: 4.5rem;
+  top: var(--sc-5);
   align-self: start;
-  max-height: calc(100svh - 5.5rem);
+  max-height: calc(100svh - 2.5rem);
   overflow-y: auto;
   padding-right: var(--sc-2);
   font-size: var(--sc-t-sm);
@@ -295,6 +192,12 @@
 .docs-chapters a:hover {
   color: var(--sc-ink);
 }
+.docs-chapters a small {
+  display: block;
+  font-size: var(--sc-t-xs);
+  color: var(--sc-ink-soft);
+  opacity: 0.85;
+}
 .docs-chapters a[aria-current='page'] {
   color: var(--sc-ink);
   border-left: 2px solid var(--sc-accent);
@@ -313,9 +216,9 @@
 }
 .toc {
   position: sticky;
-  top: 4.5rem;
+  top: var(--sc-5);
   align-self: start;
-  max-height: calc(100svh - 5.5rem);
+  max-height: calc(100svh - 2.5rem);
   overflow-y: auto;
   font-size: var(--sc-t-xs);
 }
@@ -379,7 +282,7 @@
   margin-top: 0;
 }
 .markdown :is(h1, h2, h3, h4) {
-  scroll-margin-top: 5rem;
+  scroll-margin-top: var(--sc-5);
 }
 .markdown h1 {
   font-weight: 700;
@@ -826,12 +729,6 @@
   }
 }
 @media (max-width: 860px) {
-  .appbar {
-    gap: var(--sc-3);
-  }
-  .appbar__src {
-    display: none;
-  }
   .docs,
   .docs--index {
     grid-template-columns: minmax(0, 1fr);
@@ -889,15 +786,11 @@
   .filters label {
     flex: 1 1 12rem;
   }
-  .eco ul {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
-@media (max-width: 420px) {
-  .eco ul {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .appbar__tabs a {
-    padding: 0 var(--sc-2);
-  }
+
+.sitebody {
+  padding-bottom: var(--sc-10);
+}
+.entry__facts .k {
+  color: var(--sc-ink-soft);
 }

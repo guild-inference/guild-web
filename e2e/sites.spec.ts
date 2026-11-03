@@ -43,10 +43,10 @@ for (const width of [1440, 390, 320])
 test('catalog filters, empty results, and durable detail links', async ({ page }) => {
   await page.goto('/models/');
   await page.getByLabel('Compatibility status').selectOption('Research');
-  await expect(page.locator('[data-model-card]:visible')).toHaveCount(1);
+  await expect(page.locator('[data-model-card]:visible')).toHaveCount(3);
   await page.getByRole('link', { name: 'View compatibility & sources' }).last().click();
   await page.reload();
-  await expect(page.locator('h1')).toHaveText('Eon');
+  await expect(page.locator('h1')).toHaveText('Magistrate');
   await page.goBack();
   await page.getByLabel('Search models').fill('not-a-model');
   await expect(page.locator('#model-empty')).toBeVisible();
@@ -76,6 +76,7 @@ test('engine surface: the plan fills, the command lookup filters, and copying wo
     window.scrollTo(0, plan.offsetTop + plan.offsetHeight - innerHeight * 1.2);
   });
   await expect(page.locator('[data-plan-stage]')).toHaveAttribute('data-step', '4');
+  await expect(page.locator('.gnav a[aria-current="page"]')).toHaveText('Engine');
   await expect(page.locator('[data-part="gpu"]')).toHaveClass(/on-gpu/);
   await page.getByLabel('Look up a command').fill('serve');
   await expect(page.locator('#lookup-list li:visible')).toHaveCount(1);

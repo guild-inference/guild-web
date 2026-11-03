@@ -5,7 +5,7 @@ import Site from '../../layouts/Site.astro';
 import DocsSidebar from '../../components/DocsSidebar.astro';
 import { docs } from '../../lib/docs';
 import { link } from '../../lib/links';
-import { source, revision } from '../../lib/source';
+import { source, pinned } from '../../lib/source';
 import { resolveDocHref } from '../../lib/doc-links.mjs';
 export function getStaticPaths() {
   return docs.map((doc) => ({ params: { slug: doc.slug }, props: { doc } }));
@@ -46,21 +46,21 @@ const sections = rendered.metadata.headings.filter((h) => h.depth === 2);
   current="docs"
   path={`${doc.slug}/`}
   title={`${doc.title}: Guild Docs`}
-  description={`${doc.title}. ${doc.imported ? 'Complete Guild source document' : 'Practical Guild guide'} for Core ${revision.slice(0, 7)}.`}
+  description={`${doc.title}. ${doc.imported ? 'Complete Guild source document' : 'Practical Guild guide'} for Guild ${pinned}.`}
 >
   <div class="docs">
     <DocsSidebar active={doc.slug} />
     <article class="article">
       <header class="head">
         <p class="head__meta">
-          {doc.category} · {doc.imported ? 'Repository source, complete snapshot' : 'Web guide'} · Core
-          {revision.slice(0, 7)}
+          {doc.category}{doc.subtitle ? ` · ${doc.subtitle}` : ''} ·
+          {doc.imported ? 'Repository source, complete snapshot' : 'Web guide'} · Guild {pinned}
         </p>
         {
           doc.imported && (
             <p class="source-line">
               <a href={source(doc.path)}>
-                {doc.path} at {revision.slice(0, 7)} <span aria-hidden="true">↗</span>
+                {doc.path} at {pinned} <span aria-hidden="true">↗</span>
               </a>
               <br />
               SHA-256 {doc.sha256}

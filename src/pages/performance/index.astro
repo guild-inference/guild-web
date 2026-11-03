@@ -79,7 +79,7 @@ const best = (r: (typeof rows)[number]) =>
 ---
 
 <Site
-  current="performance"
+  current="engine"
   path="performance/"
   title="Guild performance: the measurement and its limits"
   description="Selected Phase 6.6.1 measurements on dual Xeon Gold 6130 and GTX 1070, with workload, quantization, baseline and explicit limitations."
@@ -107,7 +107,8 @@ const best = (r: (typeof rows)[number]) =>
       <div>
         <h2>Reading these results</h2>
         <p>
-          Source: Phase 6.6.1 tables in the report snapshot at <code>140f6f7</code>. Engine change
+          Source: Phase 6.6.1 tables in the report pinned at <code>v0.2.0-preview.3</code> (unchanged
+          since <code>140f6f7</code>). Engine change
           <code>c7c8c79</code>; earlier Phase 6.6: <code>ed7a5db</code>. GEXEC active, CPU expert
           path, max draft 4, greedy generation. Qwen cross-window parity runs use
           <code>GUILD_IQ_MT_MIN=1</code>.

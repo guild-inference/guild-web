@@ -1,31 +1,32 @@
 ---
 import Stage from '../layouts/Stage.astro';
-import Ecosystem from '../components/Ecosystem.astro';
 import '../styles/guild.css';
 import '../styles/surface.css';
 import snapshot from '../data/generated/sources.json';
 import { models } from '../data/models';
 import { link } from '../lib/links';
-import { revision, source } from '../lib/source';
+import { pinned, tag, source } from '../lib/source';
 
-const qwen = models[0].registry!;
+const qwenEntry = models[0];
+const qwen = qwenEntry.registry!;
 const gib = (qwen.bytes / 2 ** 30).toFixed(2);
-// The help lookup lists only commands documented at the pinned revision: the README's command
-// block, plus the two GEXEC commands from the CLI guide.
+// The help lookup lists only the commands in the README's command block at the pinned release.
 const readme = snapshot.documents.find((d) => d.path === 'README.md')!.markdown;
-const block = readme.match(/```[a-z]*\n(guild pull[\s\S]*?)```/)?.[1] ?? '';
-const commands = [
-  ...block
-    .trim()
-    .split('\n')
-    .map((line) => {
-      const [, usage, what] = line.match(/^(guild \S+(?: <[^>]+>)?)\s{2,}(.+)$/) ?? [];
-      return usage ? { usage, what } : null;
-    })
-    .filter((c): c is { usage: string; what: string } => c !== null),
-  { usage: 'guild optimize <gpack>', what: 'Compile a machine-specific GEXEC execution cache' },
-  { usage: 'guild inspect <gexec> --plan', what: 'Show the execution plan inside a GEXEC cache' },
-];
+const block =
+  [...readme.matchAll(/```[a-z]*\n([\s\S]*?)```/g)]
+    .map((m) => m[1])
+    .find((b) => b.startsWith('guild ') && b.includes('guild pull <model>')) ?? '';
+const commands = block
+  .trim()
+  .split('\n')
+  .map((line) => {
+    const [, usage, what] = line.match(/^(guild \S+(?: [<[][^>\]]+[>\]])?)\s{2,}(.+)$/) ?? [];
+    return usage ? { usage, what } : null;
+  })
+  .filter((c): c is { usage: string; what: string } => c !== null);
+// Installer at the pinned release, and the SHA-256 of that exact file.
+const installer = `https://raw.githubusercontent.com/guild-inference/Guild/${tag}/install.sh`;
+const installerSha = '1c596ad770713eed7c2e3a5df72f9cde30880371eb3b357263a7f2a1d7527095';
 const steps = [
   ['file', 'Open the model file', `${gib} GiB, memory-mapped`],
   ['gpu', 'Dense path, attention state, scratch', 'GPU 0, 7,310 MiB sampled'],
@@ -75,6 +76,7 @@ const views = [
   ['inspect', 'Inspect'],
   ['plan', 'Plan'],
   ['decode', 'Decode'],
+  ['desktop', 'Desktop'],
   ['serve', 'Serve'],
 ];
 ---
@@ -83,7 +85,8 @@ const views = [
   property="guild"
   title="Guild: an 87 GiB model on an 8 GiB graphics card"
   description="Guild is a native, open-source Mixture-of-Experts inference engine. It runs large models across GPU memory, system RAM and CPU threads, with portable GPACK and machine-specific GEXEC."
-  theme="#0e110f"
+  theme="#0f1110"
+  current="engine"
 >
   <div class="app">
     <aside class="rail" aria-label="Guild">
@@ -98,26 +101,20 @@ const views = [
           ))
         }
       </nav>
-      <nav class="rail__site" aria-label="Guild sites">
-        <a href={link('docs')}>Docs</a>
-        <a href={link('models')}>Models</a>
-        <a href={link('guild', 'performance/')}>Performance</a>
-        <a href="https://github.com/guild-inference/Guild"
-          >Source <span aria-hidden="true">↗</span></a
-        >
-      </nav>
-      <a class="rail__home" href={link('illatio')}>The Guild Inference Project</a>
     </aside>
 
     <main id="main" class="surface">
       <section id="inspect" class="view inspect" data-view="inspect">
-        <p class="viewbar"><b>inspect</b> {qwen.name} · registry at {revision.slice(0, 7)}</p>
+        <p class="viewbar"><b>inspect</b> {qwen.name} · registry at Guild {pinned}</p>
         <div class="inspect__top">
           <div>
             <h1>An {gib.split('.')[0]} GiB model on an 8 GiB graphics card.</h1>
+            <p class="inspect__ram">
+              On a big-RAM server: <b>376 GiB of system RAM</b>, 2× Xeon Gold 6130, GTX 1070 8 GiB.
+            </p>
             <p class="inspect__lede">
               Guild runs Mixture-of-Experts models across GPU memory, system RAM and CPU threads.
-              Measured on a GTX 1070 with 376 GiB of RAM.
+              The experts live in system RAM, which is why this run had so much of it.
             </p>
             <p class="inspect__actions">
               <a class="cta" href={link('docs', 'getting-started/')}>Start your first run</a>
@@ -125,6 +122,13 @@ const views = [
             </p>
           </div>
           <dl class="readout" data-sc-in data-sc-stagger="45">
+            <div><dt>Display name</dt><dd>{qwenEntry.name}</dd></div>
+            <div>
+              <dt>Model id</dt><dd><code>{qwen.name}</code></dd>
+            </div>
+            <div>
+              <dt>Architecture tag</dt><dd><code>{qwen.architecture}</code></dd>
+            </div>
             <div>
               <dt>Size on disk</dt>
               <dd><span data-sc-count={`0 ${gib}`}>{gib}</span> GiB</dd>
@@ -134,6 +138,7 @@ const views = [
             <div><dt>Per token, plus shared</dt><dd>{qwen.activeExperts} + 1</dd></div>
             <div><dt>Layers</dt><dd>{qwen.layers}</dd></div>
             <div><dt>Context metadata</dt><dd>{qwen.context.toLocaleString('en-US')}</dd></div>
+            <div><dt>Type</dt><dd>{qwenEntry.type}</dd></div>
           </dl>
         </div>
         <figure class="layers">
@@ -261,22 +266,100 @@ const views = [
         </p>
       </section>
 
+      <section
+        id="desktop"
+        class="view desktop"
+        data-view="desktop"
+        aria-labelledby="desktop-title"
+      >
+        <p class="viewbar"><b>desktop</b> not measured yet</p>
+        <h2 id="desktop-title">On a normal desktop.</h2>
+        <div class="desktop__grid">
+          <p>
+            Every Guild number on this site comes from the big-RAM server above. The phase reports
+            name the desktop to measure next: Ryzen 5 5600X, 32 GiB DDR4, RTX 5070 12 GiB. They list
+            it as pending hardware access, and nothing here is extrapolated to it.
+          </p>
+          <p>
+            With less system RAM than the model file, Guild still plans the run and warns: the
+            experts are file-backed, so the operating system pages them from disk (<a
+              href={source('src/memory/planner.cpp', '#L350')}>planner.cpp</a
+            >). How fast that is on a desktop has not been measured.
+          </p>
+          <p class="todo">
+            TODO: measure Qwen3.8 and Ornith on this desktop, with full configuration.
+          </p>
+        </div>
+      </section>
+
       <section id="serve" class="view serve" data-view="serve" aria-labelledby="serve-title">
         <p class="viewbar"><b>serve</b> your machine</p>
         <h2 id="serve-title">An OpenAI-compatible endpoint on your own machine.</h2>
         <div class="serve__grid">
-          <div class="code-box">
-            <div class="code-box__bar">
-              <span>Linux, x86-64</span>
-              <button type="button" class="btn-copy" data-copy="install-code">Copy</button>
-            </div>
-            <pre
-              tabindex="0"><code id="install-code">curl -fsSL https://raw.githubusercontent.com/guild-inference/Guild/main/install.sh | bash
+          <div class="serve__code">
+            <div class="code-box">
+              <div class="code-box__bar">
+                <span>Linux, x86-64 · Guild {tag}</span>
+                <button type="button" class="btn-copy" data-copy="install-code">Copy</button>
+              </div>
+              <pre
+                tabindex="0"><code id="install-code">curl -fsSL {installer} | GUILD_VERSION={tag} bash
 guild pull {qwen.name}
 guild serve {qwen.name}</code></pre>
-            <div class="code-box__bar code-box__bar--end">
-              <span>Then point a client at <code>http://127.0.0.1:11434/v1</code></span>
+              <div class="code-box__bar code-box__bar--end">
+                <span
+                  >The download is {gib} GiB. Then point a client at
+                  <code>http://127.0.0.1:11434/v1</code>, or pick a port with
+                  <code>--port</code>.</span
+                >
+              </div>
             </div>
+            <div class="code-box">
+              <div class="code-box__bar">
+                <span>Or download, inspect, then run</span>
+                <button type="button" class="btn-copy" data-copy="inspect-code">Copy</button>
+              </div>
+              <pre
+                tabindex="0"><code id="inspect-code">curl -fsSLO {installer}
+echo "{installerSha}  install.sh" | sha256sum -c
+less install.sh
+GUILD_VERSION={tag} bash install.sh</code></pre>
+            </div>
+            <dl class="routes">
+              <div>
+                <dt><code>/v1</code></dt>
+                <dd>
+                  OpenAI compatibility layer in <code>guild serve</code>: chat completions,
+                  completions, responses and models.
+                </dd>
+              </div>
+              <div>
+                <dt><code>/health</code></dt>
+                <dd>Health check, also at <code>/api/health</code>.</dd>
+              </div>
+              <div>
+                <dt><code>/api</code></dt>
+                <dd>
+                  Ollama compatibility is not in {tag}. <span class="todo">TODO: planned?</span>
+                </dd>
+              </div>
+              <div>
+                <dt><code>/v0</code></dt>
+                <dd>Native API: planned, not in {tag}. <span class="todo">TODO</span></dd>
+              </div>
+              <div>
+                <dt><code>/v1/messages</code></dt>
+                <dd>
+                  Anthropic Messages is served only by the Python server, <code
+                    >serve/server.py</code
+                  >
+                  (port 8095 by default), not by <code>guild serve</code>.
+                </dd>
+              </div>
+            </dl>
+            <p class="todo">
+              TODO: 48453 replaces 11434 as the default port in the next release, once it ships.
+            </p>
           </div>
           <form class="lookup" role="search" data-lookup>
             <label for="lookup">Look up a command</label>
@@ -292,7 +375,7 @@ guild serve {qwen.name}</code></pre>
               />
             </div>
             <p id="lookup-help" class="lookup__help">
-              Describes the commands documented at {revision.slice(0, 7)}. It does not run anything.
+              Describes the commands in the README at {tag}. It does not run anything.
             </p>
             <ul class="lookup__list" id="lookup-list">
               {
@@ -312,22 +395,13 @@ guild serve {qwen.name}</code></pre>
         <p class="links">
           <a href={link('docs', 'serving/')}>Serving guide</a>
           <a href={link('docs', 'cli/')}>CLI reference</a>
-          <a href={source('README.md')}>README at {revision.slice(0, 7)} ↗</a>
+          <a href={source('README.md')}>README at {tag} ↗</a>
         </p>
-        <footer class="serve__foot">
-          <Ecosystem />
-          <p>
-            Guild is open source under MIT and under active development. Part of
-            <a href={link('illatio')}>The Guild Inference Project</a>, {
-              new Date().getUTCFullYear()
-            }.
-          </p>
-        </footer>
       </section>
     </main>
 
     <p class="status" aria-hidden="true">
-      <span>Core {revision.slice(0, 7)}</span>
+      <span>Guild {pinned}</span>
       <span>{qwen.name} {qwen.quantization}</span>
       <span>Measured host: 2× Xeon Gold 6130 · 376 GiB · GTX 1070 8 GiB</span>
       <span class="status__view" data-status-view>inspect</span>

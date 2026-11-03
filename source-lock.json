@@ -1,6 +1,7 @@
 {
   "repository": "guild-inference/Guild",
-  "commit": "140f6f765ffc77d2b7b9aebdc6e41a4e3e9bc3f6",
+  "tag": "v0.2.0-preview.3",
+  "commit": "97a1bafb1b66f30d45c75b4138664aa1cf8e8e87",
   "documents": [
     {
       "slug": "repository-readme",
@@ -70,21 +71,24 @@
     },
     {
       "slug": "phase6",
-      "title": "Phase 6: Long context",
+      "title": "Long-context optimization",
       "category": "Performance archive",
-      "path": "docs/performance/PHASE6_LONG_CONTEXT_OPTIMIZATION.md"
+      "path": "docs/performance/PHASE6_LONG_CONTEXT_OPTIMIZATION.md",
+      "subtitle": "Phase 6"
     },
     {
       "slug": "phase65",
-      "title": "Phase 6.5: Runtime optimization",
+      "title": "Runtime optimization",
       "category": "Performance archive",
-      "path": "docs/performance/PHASE65_GENERAL_OPTIMIZATION.md"
+      "path": "docs/performance/PHASE65_GENERAL_OPTIMIZATION.md",
+      "subtitle": "Phase 6.5"
     },
     {
       "slug": "phase66",
-      "title": "Phase 6.6 & 6.6.1: Adaptive decoding",
+      "title": "Adaptive speculative decoding",
       "category": "Performance archive",
-      "path": "docs/performance/PHASE66_ADAPTIVE_SPECULATIVE_DECODING.md"
+      "path": "docs/performance/PHASE66_ADAPTIVE_SPECULATIVE_DECODING.md",
+      "subtitle": "Phase 6.6 and 6.6.1"
     },
     {
       "slug": "contributing",

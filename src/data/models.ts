@@ -5,9 +5,15 @@ const registry = parseRegistry(
   snapshot.documents.find((d) => d.path === 'src/models/registry.cpp')!.markdown,
 );
 export type ModelStage = 'Supported' | 'Experimental' | 'Planned' | 'Research';
+export type ModelType = 'Text' | 'Speech';
 interface Entry {
+  /** URL slug for this catalog page. */
   id: string;
+  /** Display name. */
   name: string;
+  /** The registry name: what `guild pull`, `guild run` and `guild serve` accept. */
+  modelId?: string;
+  type: ModelType;
   stage: ModelStage;
   summary: string;
   architecture: string;
@@ -23,6 +29,8 @@ export const models: Entry[] = [
   {
     id: 'qwen3-8-flash-next',
     name: 'Qwen3.8-Flash-Next',
+    modelId: registry[0].name,
+    type: 'Text',
     stage: 'Supported',
     architecture: 'qwen4exp',
     parameters: `${(hub.qwen.ggufTotalParameters / 1e9).toFixed(2)}B stored parameters (Hub GGUF metadata)`,
@@ -45,6 +53,8 @@ export const models: Entry[] = [
   {
     id: 'ornith-1-5-35b',
     name: 'Ornith 1.5 35B',
+    modelId: registry[1].name,
+    type: 'Text',
     stage: 'Experimental',
     architecture: 'qwen35moe',
     parameters: '35B nominal model name; upstream count not independently verified',
@@ -66,6 +76,7 @@ export const models: Entry[] = [
   ...['GLM', 'DeepSeek', 'Mixtral'].map((name) => ({
     id: name.toLowerCase(),
     name: `${name}-style MoE`,
+    type: 'Text' as const,
     stage: 'Planned' as const,
     architecture: `${name.toLowerCase()} archetype`,
     parameters: 'Model-dependent; no checkpoint selected',
@@ -79,20 +90,34 @@ export const models: Entry[] = [
       'Refer to MODEL_RUNNERS.md and src/model/archetype.cpp for the boundary between metadata descriptions and execution.',
     ],
   })),
-  {
-    id: 'eon',
-    name: 'Eon',
-    stage: 'Research',
-    architecture: 'Proposed family; architecture not finalized',
+  ...(
+    [
+      ['apprentice', 'Apprentice', 'Ternary heal of NVIDIA Nemotron 3 Nano 4B.'],
+      [
+        'journeyman',
+        'Journeyman',
+        'Ternary heal of Nemotron Lightning. Depends on a pending compute grant.',
+      ],
+      [
+        'magistrate',
+        'Magistrate',
+        'Ternary heal of Nemotron Super. Depends on compute. Will be open-weight.',
+      ],
+    ] as const
+  ).map(([id, name, plan]) => ({
+    id,
+    name,
+    type: 'Text' as const,
+    stage: 'Research' as const,
+    architecture: 'Ternary heal of an NVIDIA Nemotron model',
     parameters: 'Not specified',
     activeParameters: 'Not specified',
-    availability: 'No released checkpoints. Research grant decision pending.',
+    availability: 'No released weights. Status: TODO.',
     memory: 'Not specified; no model artifact exists to measure.',
-    summary:
-      'Guild Labs’ proposed model family. Research interests include efficient language models, sparse MoE architectures, and ternary representations.',
+    summary: `Guild Labs v0 plan. ${plan}`,
     notes: [
-      'Scale, quantization, architecture, and release dates have not been finalized.',
-      'No performance, memory-fit, or model quality claims are made.',
+      'No results, checkpoints, release dates or benchmark numbers yet.',
+      'Every model must pass the Masterpiece evaluation gate before release.',
     ],
-  },
+  })),
 ];

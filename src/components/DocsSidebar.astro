@@ -33,6 +33,7 @@ const { active } = Astro.props;
                   aria-current={d.slug === active ? 'page' : undefined}
                 >
                   {d.title}
+                  {d.subtitle && <small>{d.subtitle}</small>}
                 </a>
               ))}
           </section>

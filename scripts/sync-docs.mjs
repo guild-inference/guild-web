@@ -33,7 +33,11 @@ for (const path of files) {
   });
 }
 const output =
-  JSON.stringify({ repository: lock.repository, commit: lock.commit, documents }, null, 2) + '\n';
+  JSON.stringify(
+    { repository: lock.repository, tag: lock.tag, commit: lock.commit, documents },
+    null,
+    2,
+  ) + '\n';
 const destination = new URL('sources.json', root);
 if (check) {
   if ((await readFile(destination, 'utf8')) !== output)
