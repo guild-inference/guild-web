@@ -23,9 +23,10 @@ for (const width of [1440, 390, 320])
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
       ).toBeTruthy();
+      await expect(page.locator('h1')).toBeVisible();
       expect(
         await page.evaluate(() =>
-          [...document.querySelectorAll('.pillar, .paper, .band, .model-card, .notice')].every(
+          [...document.querySelectorAll('h1, .note, .panel, [data-model-card]')].every(
             (el) => Number(getComputedStyle(el).opacity) === 1,
           ),
         ),
@@ -64,17 +65,23 @@ test('docs full text search, deep links, and complete long documents', async ({ 
   await expect(page).toHaveURL(/\/docs\/gpack\/$/);
 });
 
-test('routing illustration, token stepping, pulse animation, and clipboard feedback work', async ({
+test('engine surface: the plan fills, the command lookup filters, and copying works', async ({
   page,
   context,
 }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Send a token pulse' }).click();
-  await expect(page.locator('[data-field-card]')).toHaveClass(/is-pulsing/);
-  await page.getByRole('button', { name: 'Qwen · 10 / 512' }).click();
-  await expect(page.locator('#route-caption')).toContainText('10 of 512');
-  await page.getByRole('button', { name: /Step next token/ }).click();
-  await expect(page.locator('.network-grid i.on').first()).toBeVisible();
+  await page.evaluate(() => {
+    const plan = document.querySelector<HTMLElement>('#plan')!;
+    window.scrollTo(0, plan.offsetTop + plan.offsetHeight - innerHeight * 1.2);
+  });
+  await expect(page.locator('[data-plan-stage]')).toHaveAttribute('data-step', '4');
+  await expect(page.locator('[data-part="gpu"]')).toHaveClass(/on-gpu/);
+  await page.getByLabel('Look up a command').fill('serve');
+  await expect(page.locator('#lookup-list li:visible')).toHaveCount(1);
+  await expect(page.locator('#lookup-list li:visible')).toContainText('OpenAI-compatible');
+  await page.getByLabel('Look up a command').fill('launch-rocket');
+  await expect(page.locator('#lookup-empty')).toBeVisible();
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto('/models/qwen3-8-flash-next/');
   await page.getByRole('button', { name: 'Copy', exact: true }).click();

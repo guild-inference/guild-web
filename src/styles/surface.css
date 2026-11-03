@@ -1,0 +1,707 @@
+/* guild.illatio.dev: a live surface. App chrome is the navigation; copy speaks in the tool's idiom. */
+.app {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, 1fr);
+  min-height: 100svh;
+}
+
+/* ------------------------------------------------------------------ rail -- */
+.rail {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sc-6);
+  padding: var(--sc-6) var(--sc-5) 3rem;
+  border-right: 1px solid var(--sc-hairline);
+  background: var(--sc-canvas);
+  font-size: var(--sc-t-sm);
+}
+.rail__mark {
+  font-family: var(--sc-font-display);
+  font-weight: 750;
+  font-size: var(--sc-t-xl);
+  letter-spacing: -0.035em;
+  text-decoration: none;
+}
+.rail__sub {
+  margin: calc(-1 * var(--sc-4)) 0 0;
+  font-size: var(--sc-t-xs);
+  color: var(--sc-ink-soft);
+}
+.rail__views,
+.rail__site {
+  display: grid;
+  gap: 2px;
+}
+.rail__views a,
+.rail__site a {
+  padding: 0.38rem var(--sc-3);
+  border-radius: var(--sc-r-sm);
+  color: var(--sc-ink-soft);
+  text-decoration: none;
+  transition:
+    background-color var(--sc-d-fast) var(--sc-ease-out),
+    color var(--sc-d-fast) var(--sc-ease-out);
+}
+.rail__views a:hover,
+.rail__site a:hover {
+  color: var(--sc-ink);
+  background: var(--sc-surface);
+}
+.rail__views a[aria-current] {
+  color: var(--sc-ink);
+  background: var(--sc-surface);
+  box-shadow: inset 2px 0 0 var(--sc-accent);
+}
+.rail__site {
+  padding-top: var(--sc-5);
+  border-top: 1px solid var(--sc-hairline);
+}
+.rail__home {
+  margin-top: auto;
+  font-size: var(--sc-t-xs);
+  color: var(--sc-ink-soft);
+}
+
+/* ---------------------------------------------------------------- status -- */
+.status {
+  position: fixed;
+  left: 15rem;
+  right: 0;
+  bottom: 0;
+  z-index: 45;
+  display: flex;
+  gap: var(--sc-5);
+  height: 2rem;
+  margin: 0;
+  padding: 0 var(--sc-5);
+  align-items: center;
+  background: var(--raise);
+  border-top: 1px solid var(--sc-hairline);
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  color: var(--sc-ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.status__view {
+  margin-left: auto;
+  color: var(--sc-accent);
+}
+.status__view::before {
+  content: 'view ';
+  color: var(--sc-ink-soft);
+}
+
+/* ----------------------------------------------------------------- views -- */
+.surface {
+  min-width: 0;
+  padding-bottom: 2rem;
+}
+.view {
+  padding: var(--sc-8) clamp(1.5rem, 4vw, 4.5rem);
+  border-bottom: 1px solid var(--sc-hairline);
+}
+.viewbar {
+  margin: 0 0 var(--sc-5);
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  color: var(--sc-ink-soft);
+}
+.viewbar b {
+  margin-right: var(--sc-2);
+  font-weight: 600;
+  color: var(--sc-accent);
+}
+.view h2 {
+  font-weight: 700;
+  font-stretch: 92%;
+  font-size: clamp(1.8rem, 1rem + 2.2vw, 3rem);
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+/* inspect */
+.inspect {
+  min-height: calc(100svh - 2rem);
+  display: grid;
+  align-content: center;
+  gap: var(--sc-7);
+}
+.inspect .viewbar {
+  margin: 0;
+}
+.inspect__top {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(16rem, 0.85fr);
+  gap: var(--sc-8);
+  align-items: end;
+}
+.inspect h1 {
+  max-width: 14ch;
+  font-weight: 700;
+  font-stretch: 90%;
+  font-size: clamp(2.6rem, 1rem + 4.4vw, 5.4rem);
+  line-height: 0.94;
+  letter-spacing: -0.045em;
+}
+.inspect__lede {
+  max-width: 44ch;
+  margin: var(--sc-5) 0 0;
+  font-size: var(--sc-t-lg);
+  line-height: 1.45;
+  color: var(--sc-ink-soft);
+}
+.inspect__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sc-4) var(--sc-6);
+  margin: var(--sc-6) 0 0;
+}
+.inspect__actions a:not(.cta) {
+  color: var(--sc-ink);
+}
+.cta {
+  display: inline-flex;
+  padding: 0.8rem 1.25rem;
+  background: var(--sc-accent);
+  color: var(--sc-accent-ink);
+  font-weight: 650;
+  text-decoration: none;
+  border-radius: var(--sc-r-sm);
+  box-shadow: var(--sc-e2);
+  transition:
+    transform var(--sc-d-fast) var(--sc-ease-out),
+    background-color var(--sc-d-fast) var(--sc-ease-out);
+}
+.cta:hover {
+  background: color-mix(in oklab, var(--sc-accent) 86%, white);
+}
+.cta:active {
+  transform: scale(0.97);
+}
+.readout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  border-top: 1px solid var(--sc-hairline-strong);
+}
+.readout div {
+  padding: var(--sc-3) var(--sc-3) var(--sc-3) 0;
+  border-bottom: 1px solid var(--sc-hairline);
+}
+.readout dt {
+  font-size: var(--sc-t-xs);
+  color: var(--sc-ink-soft);
+}
+.readout dd {
+  margin: 2px 0 0;
+  font-family: var(--sc-font-display);
+  font-weight: 650;
+  font-stretch: 92%;
+  font-size: var(--sc-t-xl);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.layers {
+  margin: 0;
+}
+.layers__strip {
+  display: flex;
+  gap: 3px;
+  height: 2.6rem;
+}
+.layers__strip i {
+  flex: 1;
+  border-radius: 2px;
+  background: color-mix(in oklab, var(--sc-ink) 16%, transparent);
+}
+.layers__strip i.att {
+  background: var(--sc-accent);
+}
+.layers figcaption {
+  margin-top: var(--sc-3);
+  font-size: var(--sc-t-xs);
+  color: var(--sc-ink-soft);
+}
+.layers figcaption a {
+  color: var(--sc-ink);
+}
+
+/* plan: the measured host fills as the placement proceeds */
+.plan {
+  padding: 0;
+}
+.plan__stage {
+  display: grid;
+  grid-template-columns: minmax(16rem, 0.85fr) minmax(0, 1.6fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: center;
+  padding: var(--sc-6) clamp(1.5rem, 4vw, 4.5rem) 3.5rem;
+}
+.plan__side h2 {
+  margin-bottom: var(--sc-5);
+}
+.steps {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+.steps li {
+  display: grid;
+  gap: 1px;
+  padding: var(--sc-2) var(--sc-3);
+  border-left: 2px solid var(--sc-hairline);
+  color: color-mix(in oklab, var(--sc-ink) 60%, var(--sc-canvas));
+  transition:
+    color var(--sc-d-base) var(--sc-ease-out),
+    border-color var(--sc-d-base) var(--sc-ease-out);
+}
+.steps li span {
+  font-size: var(--sc-t-sm);
+}
+.steps li b {
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  font-weight: 500;
+}
+.steps li.is-done {
+  color: var(--sc-ink-soft);
+  border-left-color: var(--sc-hairline-strong);
+}
+.steps li.is-now {
+  color: var(--sc-ink);
+  border-left-color: var(--sc-accent);
+  background: var(--sc-surface);
+}
+.steps li.is-now b {
+  color: var(--sc-accent);
+}
+.plan__note {
+  margin: var(--sc-5) 0 0;
+  font-size: var(--sc-t-xs);
+  color: var(--sc-ink-soft);
+}
+.host {
+  display: grid;
+  gap: var(--sc-4);
+}
+.cpus {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sc-4);
+}
+.part {
+  padding: var(--sc-4);
+  background: var(--sc-surface);
+  border: 1px solid var(--sc-hairline);
+  border-radius: var(--sc-r-md);
+  box-shadow: var(--sc-edge);
+  transition:
+    background-color var(--sc-d-slow) var(--sc-ease-out),
+    border-color var(--sc-d-slow) var(--sc-ease-out);
+}
+/* A part the plan has not reached yet is drawn as an outline. */
+.part:not([class*='on-']) {
+  background: transparent;
+  border-style: dashed;
+  box-shadow: none;
+}
+.part[class*='on-'] {
+  border-color: var(--sc-hairline-strong);
+}
+.part__name {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sc-3);
+  margin: 0 0 var(--sc-3);
+  font-weight: 600;
+  font-size: var(--sc-t-sm);
+}
+.part__name span {
+  font-weight: 400;
+  color: var(--sc-ink-soft);
+}
+.part__scale {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sc-3);
+  margin: var(--sc-2) 0 0;
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  color: var(--sc-ink-soft);
+}
+.gauge {
+  position: relative;
+  height: 1.1rem;
+  background: var(--raise);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.gauge i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 100%;
+  background: var(--sc-accent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+/* Fills follow scroll directly (no transition), from the step progress the page script writes. */
+.part--file .gauge i {
+  transform: scaleX(calc(var(--fill) * var(--t-file, 0)));
+}
+.part--gpu .gauge i {
+  transform: scaleX(calc(var(--fill) * var(--t-gpu, 0)));
+}
+.part--ram .gauge__experts {
+  transform: scaleX(calc(var(--fill) * var(--t-ram, 0)));
+}
+.gauge--ram {
+  background-image: linear-gradient(
+    90deg,
+    transparent calc(50% - 1px),
+    var(--sc-hairline-strong) calc(50% - 1px),
+    var(--sc-hairline-strong) 50%,
+    transparent 50%
+  );
+  background-color: var(--raise);
+}
+.gauge__kv {
+  left: calc(var(--at) * 100% + 3px) !important;
+  width: 4% !important;
+  background: repeating-linear-gradient(
+    135deg,
+    var(--sc-accent) 0 3px,
+    transparent 3px 6px
+  ) !important;
+}
+.part--ram .gauge__kv {
+  transform: scaleX(var(--t-kv, 0));
+}
+.cores {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+}
+.cores i {
+  aspect-ratio: 1.6;
+  border-radius: 2px;
+  background: var(--raise);
+  transition: background-color var(--sc-d-fast) var(--sc-ease-out);
+}
+.cores i.is-lit {
+  background: var(--sc-accent);
+}
+
+/* decode */
+.decode h2 {
+  max-width: 20ch;
+}
+.decode__config {
+  max-width: 70ch;
+  margin: var(--sc-4) 0 0;
+  font-size: var(--sc-t-sm);
+  color: var(--sc-ink-soft);
+}
+.decode__runs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sc-6);
+  margin-top: var(--sc-7);
+}
+.trace h3 {
+  display: grid;
+  gap: 2px;
+  font-size: var(--sc-t-lg);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+.trace h3 span {
+  font-family: var(--sc-font-text);
+  font-size: var(--sc-t-sm);
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--sc-ink-soft);
+}
+.trace__meta {
+  margin: var(--sc-2) 0 var(--sc-4);
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  color: var(--sc-ink-soft);
+}
+.trace dl {
+  display: grid;
+  gap: var(--sc-3);
+  margin: 0;
+}
+.trace dl div {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr) auto;
+  gap: var(--sc-3);
+  align-items: center;
+  font-size: var(--sc-t-sm);
+}
+.trace dt {
+  color: var(--sc-ink-soft);
+}
+.trace dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.trace__bar {
+  position: relative;
+  height: 0.8rem;
+  background: var(--raise);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.trace__bar i {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in oklab, var(--sc-ink) 42%, var(--sc-canvas));
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 1100ms var(--sc-ease-out);
+}
+.trace .is-best .trace__bar i {
+  background: var(--sc-accent);
+}
+.trace .is-best dd:last-child {
+  color: var(--sc-accent);
+}
+.trace.is-in .trace__bar i {
+  transform: scaleX(var(--v));
+}
+.trace.is-in div:nth-child(2) .trace__bar i {
+  transition-delay: 120ms;
+}
+.trace.is-in div:nth-child(3) .trace__bar i {
+  transition-delay: 240ms;
+}
+.decode__more {
+  max-width: 64ch;
+  margin: var(--sc-7) 0 0;
+  color: var(--sc-ink-soft);
+}
+.decode__more a {
+  color: var(--sc-ink);
+}
+
+/* serve: the page ends on an input */
+.serve {
+  border-bottom: 0;
+}
+.serve h2 {
+  max-width: 22ch;
+}
+.serve__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: var(--sc-6);
+  align-items: start;
+  margin-top: var(--sc-6);
+}
+.code-box__bar--end {
+  border-top: 1px solid var(--sc-hairline);
+}
+.lookup {
+  padding: var(--sc-5);
+  background: var(--sc-surface);
+  border: 1px solid var(--sc-hairline);
+  border-radius: var(--sc-r-lg);
+  box-shadow: var(--sc-edge), var(--sc-e2);
+}
+.lookup label {
+  display: block;
+  margin-bottom: var(--sc-2);
+  font-weight: 600;
+  font-size: var(--sc-t-sm);
+}
+.lookup__field {
+  display: flex;
+  align-items: center;
+  gap: var(--sc-2);
+  padding: 0 var(--sc-3);
+  background: var(--sc-canvas);
+  border: 1px solid var(--sc-hairline-strong);
+  border-radius: var(--sc-r-sm);
+  font-family: var(--sc-font-mono);
+}
+.lookup__field:focus-within {
+  outline: 2px solid var(--sc-accent);
+  outline-offset: 2px;
+}
+.lookup__field span {
+  color: var(--sc-accent);
+}
+.lookup__field input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.65rem 0;
+  background: none;
+  border: 0;
+  font-family: var(--sc-font-mono);
+}
+.lookup__field input:focus-visible {
+  outline: none;
+}
+.lookup__help {
+  margin: var(--sc-2) 0 0;
+  font-size: var(--sc-t-xs);
+  color: var(--sc-ink-soft);
+}
+.lookup__list {
+  display: grid;
+  gap: 0;
+  margin: var(--sc-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.lookup__list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--sc-3);
+  padding: var(--sc-2) 0;
+  border-top: 1px solid var(--sc-hairline);
+  font-size: var(--sc-t-sm);
+}
+.lookup__list code {
+  background: none !important;
+  padding: 0 !important;
+  color: var(--sc-ink);
+}
+.lookup__list span {
+  color: var(--sc-ink-soft);
+}
+.lookup__empty {
+  margin: var(--sc-4) 0 0;
+  font-size: var(--sc-t-sm);
+  color: var(--sc-ink-soft);
+}
+.serve__foot {
+  margin-top: var(--sc-10);
+  font-size: var(--sc-t-xs);
+  color: var(--sc-ink-soft);
+}
+.serve__foot > p {
+  margin: var(--sc-5) 0 0;
+}
+.serve__foot > p a {
+  color: var(--sc-ink);
+}
+
+/* ---------------------------------------------------------------- phones -- */
+@media (max-width: 1100px) {
+  .decode__runs {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 36rem;
+  }
+  .serve__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 860px) {
+  .app {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .rail {
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--sc-4);
+    padding: 0 var(--sc-gutter);
+    min-height: 3.25rem;
+    border-right: 0;
+    border-bottom: 1px solid var(--sc-hairline);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .rail__sub,
+  .rail__site,
+  .rail__home {
+    display: none;
+  }
+  .rail__views {
+    display: flex;
+    gap: 0;
+  }
+  .rail__views a {
+    padding: 0.4rem var(--sc-2);
+    white-space: nowrap;
+  }
+  .rail__views a[aria-current] {
+    box-shadow: inset 0 -2px 0 var(--sc-accent);
+    background: none;
+  }
+  .status {
+    display: none;
+  }
+  .surface {
+    padding-bottom: 0;
+  }
+  .view {
+    padding: var(--sc-7) var(--sc-gutter);
+  }
+  .inspect {
+    min-height: auto;
+    gap: var(--sc-6);
+  }
+  .inspect__top {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sc-6);
+  }
+  .layers__strip {
+    height: 2rem;
+    gap: 2px;
+  }
+  .plan__stage {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    gap: var(--sc-4);
+    padding: var(--sc-5) var(--sc-gutter) var(--sc-4);
+  }
+  .plan__side h2 {
+    margin-bottom: var(--sc-3);
+    font-size: var(--sc-t-xl);
+  }
+  .steps li:not(.is-now) {
+    display: none;
+  }
+  .steps li:first-child:not(.is-done):not(.is-now) {
+    display: grid;
+  }
+  .plan__note {
+    display: none;
+  }
+  .host {
+    gap: var(--sc-3);
+  }
+  .part {
+    padding: var(--sc-3);
+  }
+  .part__name {
+    margin-bottom: var(--sc-2);
+    font-size: var(--sc-t-xs);
+  }
+  .cpus {
+    gap: var(--sc-3);
+  }
+  .lookup__list li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .trace__bar i,
+  .cores i {
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+  }
+}

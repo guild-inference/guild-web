@@ -1,21 +1,22 @@
 ---
-import Shell from '../layouts/Shell.astro';
+import Site from '../layouts/Site.astro';
 import { link } from '../lib/links';
 ---
 
-<Shell
-  property="guild"
-  title="Page not found — Guild"
-  description="Return to Guild or search its documentation."
+<Site
+  title="Page not found: Guild"
+  description="Return to Guild, its documentation or the model catalog."
   noindex
-  ><section class="subhero wrap">
-    <div class="eyebrow">404 / Page not found</div><h1>
-      Let’s find<br /><em>another path.</em>
-    </h1><div class="actions">
-      <a class="button" href={link('docs')}>Search documentation ↗</a><a
-        class="text-link"
-        href={link('guild')}>Guild home ↗</a
-      >
-    </div>
-  </section></Shell
 >
+  <div class="page">
+    <header class="head">
+      <p class="head__meta">404 · not found</p>
+      <h1>No such path in this build.</h1>
+      <p class="head__lede">
+        Try the <a href={link('guild')}>engine overview</a>, the <a href={link('docs')}
+          >documentation</a
+        > or the <a href={link('models')}>model catalog</a>.
+      </p>
+    </header>
+  </div>
+</Site>

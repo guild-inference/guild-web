@@ -1,5 +1,5 @@
 ---
-import Shell from '../../layouts/Shell.astro';
+import Site from '../../layouts/Site.astro';
 import { link } from '../../lib/links';
 import { source } from '../../lib/source';
 const rows = [
@@ -68,178 +68,165 @@ const rows = [
     section: '§8.3 B',
   },
 ];
+const fixedLabel = (r: (typeof rows)[number]) => r.fixed.split(' · ')[0];
+const fixedValue = (r: (typeof rows)[number]) => r.fixed.split(' · ')[1];
+const best = (r: (typeof rows)[number]) =>
+  Math.max(r.normalNum, r.fixedNum, r.adaptiveNum) === r.adaptiveNum
+    ? 'adaptive'
+    : Math.max(r.normalNum, r.fixedNum) === r.fixedNum
+      ? 'fixed'
+      : 'normal';
 ---
 
-<Shell
-  property="guild"
+<Site
+  current="performance"
   path="performance/"
-  title="Guild performance — The measurement and its limits"
-  description="Selected Phase 6.6.1 measurements on dual Xeon Gold 6130 and GTX 1070, with workload, quantization, baseline, and explicit limitations."
+  title="Guild performance: the measurement and its limits"
+  description="Selected Phase 6.6.1 measurements on dual Xeon Gold 6130 and GTX 1070, with workload, quantization, baseline and explicit limitations."
 >
-  <section class="subhero wrap">
-    <div class="eyebrow"><span class="dot"></span> Evidence / performance</div>
-    <h1>The measurement.<br /><em>And its limits.</em></h1>
-    <p class="lead">
-      Selected reported results, not a universal speed claim. Every row below belongs to a specific
-      model, workload, and decoding configuration.
-    </p>
-  </section>
+  <div class="page">
+    <header class="head">
+      <p class="head__meta">Evidence · Phase 6.6.1 · decode tokens per second</p>
+      <h1>The measurement, and its limits.</h1>
+      <p class="head__lede">
+        Selected reported results, not a universal speed claim. Every row belongs to a specific
+        model, workload and decoding configuration.
+      </p>
+    </header>
 
-  <section class="section wrap">
-    <div class="grid-two">
-      <div class="paper">
-        <span class="section-label">Measured machine</span>
-        <h2 style="font-size:2.5rem;margin-top:20px">A large-RAM server.<br />An 8 GiB GPU.</h2>
-        <ul class="check-list">
-          <li>CPU<span>2× Xeon Gold 6130 · 32C / 64T</span></li>
-          <li>Memory<span>376 GiB DDR4 · dual NUMA</span></li>
-          <li>GPU<span>GeForce GTX 1070 · 8 GiB</span></li>
-          <li>Platform<span>Linux · AVX-512 capable</span></li>
-        </ul>
+    <section class="machine" aria-labelledby="machine">
+      <div class="panel">
+        <h2 id="machine">A large-RAM server with an 8 GiB card.</h2>
+        <dl class="labels">
+          <div><dt>CPU</dt><dd>2× Xeon Gold 6130, 32 cores, 64 threads</dd></div>
+          <div><dt>Memory</dt><dd>376 GiB DDR4, two NUMA nodes</dd></div>
+          <div><dt>GPU</dt><dd>GeForce GTX 1070, 8 GiB</dd></div>
+          <div><dt>Platform</dt><dd>Linux, AVX-512 capable</dd></div>
+        </dl>
       </div>
       <div>
-        <h2 style="font-size:2.8rem">Reading these results</h2>
-        <p style="margin-top:20px">
-          Source: Phase 6.6.1 tables in the report snapshot at <code>140f6f7</code>. Engine change:
+        <h2>Reading these results</h2>
+        <p>
+          Source: Phase 6.6.1 tables in the report snapshot at <code>140f6f7</code>. Engine change
           <code>c7c8c79</code>; earlier Phase 6.6: <code>ed7a5db</code>. GEXEC active, CPU expert
-          path, max draft 4, greedy generation. Qwen cross-window parity runs use{' '}
+          path, max draft 4, greedy generation. Qwen cross-window parity runs use
           <code>GUILD_IQ_MT_MIN=1</code>.
         </p>
-        <p style="margin-top:18px">
+        <p>
           These are decode tokens per second, not end-to-end request throughput. Ranges combine
           reported development runs and revisions; they are not confidence intervals or paired
-          median/dispersion estimates.
+          median and dispersion estimates.
         </p>
-        <p style="margin-top:18px">
+        <p>
           GEXEC artifacts were regenerated during tuning. Exact per-row calibration identity is not
-          established here, limiting controlled cross-revision comparisons.
+          established here, which limits controlled cross-revision comparisons.
         </p>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="section wrap">
-    <div class="section-heading">
-      <span class="section-label">01 / Selected development results</span>
-      <h2>The workload changes<br />the outcome.</h2>
-    </div>
-    <div
-      class="table-scroll"
-      tabindex="0"
-      role="region"
-      aria-label="Benchmark results; scroll horizontally on small screens"
-    >
-      <table>
-        <caption style="text-align:left;padding:15px;font-size:12px">
-          Phase 6.6.1 · decode tok/s · prompt / generated token counts
-        </caption>
-        <thead>
-          <tr>
-            <th scope="col">Model / quantization</th>
-            <th scope="col">Workload</th>
-            <th scope="col">Prompt / gen</th>
-            <th scope="col">Normal</th>
-            <th scope="col">Fixed strategy</th>
-            <th scope="col">Adaptive</th>
-            <th scope="col">Source</th>
-          </tr>
-        </thead>
-        <tbody>
-          {
-            rows.map((r) => (
-              <tr>
-                <td>
-                  {r.model}
-                  <br />
-                  <code>{r.quant}</code>
-                </td>
-                <td>{r.workload}</td>
-                <td>{r.tokens}</td>
-                <td>{r.normal}</td>
-                <td>{r.fixed}</td>
-                <td>{r.adaptive}</td>
-                <td>
-                  <a
-                    href={source(
-                      'docs/performance/PHASE66_ADAPTIVE_SPECULATIVE_DECODING.md',
-                      '#83-controlled-phase-66-vs-phase-661-benchmark-comparison',
-                    )}
-                  >
-                    {r.section} ↗
-                  </a>
-                </td>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <div class="grid-two" style="margin-top:25px">
-      {
-        rows.map((r) => (
-          <div class="paper">
-            <h3>
-              {r.model} / {r.workload}
-            </h3>
-            <div class="rhythm-stage">
-              <div class="rhythm-lane">
-                <div class="rhythm-lane-head">
-                  <span>Normal (T=1)</span>
-                  <span>{r.normal} tok/s</span>
-                </div>
-                <div class="rhythm-bar">
-                  <div
-                    class="rhythm-bar-fill"
-                    style={`width: ${Math.round((r.normalNum / r.maxScale) * 100)}%; opacity: 0.55`}
-                  />
-                </div>
-              </div>
-              <div class="rhythm-lane">
-                <div class="rhythm-lane-head">
-                  <span>Fixed ({r.fixed.split(' · ')[0]})</span>
-                  <span>{r.fixed.split(' · ')[1]} tok/s</span>
-                </div>
-                <div class="rhythm-bar">
-                  <div
-                    class="rhythm-bar-fill"
-                    style={`width: ${Math.round((r.fixedNum / r.maxScale) * 100)}%; opacity: 0.78`}
-                  />
-                </div>
-              </div>
-              <div class="rhythm-lane">
-                <div class="rhythm-lane-head">
-                  <span>Adaptive (Phase 6.6.1)</span>
-                  <span>{r.adaptive} tok/s</span>
-                </div>
-                <div class="rhythm-bar">
-                  <div
-                    class="rhythm-bar-fill"
-                    style={`width: ${Math.round((r.adaptiveNum / r.maxScale) * 100)}%`}
-                  />
-                </div>
-              </div>
-            </div>
-            <p>{r.note}</p>
-          </div>
-        ))
-      }
-    </div>
-
-    <div class="notice">
-      <strong>Held-out counterexample:</strong> Ornith H4 (Riemann tensor) reports 50.16 tok/s normal,
-      42.07 fixed lookup, and 47.92 adaptive. Adaptive is below normal by about 4.5%. The summary table
-      does not provide complete per-run configuration; treat it as a reported observation rather than
-      a reproducible paired estimate.
-    </div>
-  </section>
-
-  <section class="section wrap">
-    <div class="statement">
-      <div>
-        <span class="eyebrow">02 / Boundaries of the evidence</span>
-        <h2>What these numbers<br />do not establish.</h2>
+    <section class="section" aria-labelledby="results">
+      <h2 id="results">The workload changes the outcome.</h2>
+      <div
+        class="table-scroll"
+        tabindex="0"
+        role="region"
+        aria-label="Benchmark results; scroll horizontally on small screens"
+      >
+        <table>
+          <caption class="visually-hidden">
+            Phase 6.6.1, decode tokens per second, prompt and generated token counts
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Model, quantization</th>
+              <th scope="col">Workload</th>
+              <th scope="col">Prompt / gen</th>
+              <th scope="col">Normal</th>
+              <th scope="col">Fixed strategy</th>
+              <th scope="col">Adaptive</th>
+              <th scope="col">Source</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              rows.map((r) => (
+                <tr>
+                  <td>
+                    {r.model}
+                    <br />
+                    <code>{r.quant}</code>
+                  </td>
+                  <td>{r.workload}</td>
+                  <td>{r.tokens}</td>
+                  <td>{r.normal}</td>
+                  <td>{r.fixed}</td>
+                  <td>{r.adaptive}</td>
+                  <td>
+                    <a
+                      href={source(
+                        'docs/performance/PHASE66_ADAPTIVE_SPECULATIVE_DECODING.md',
+                        '#83-controlled-phase-66-vs-phase-661-benchmark-comparison',
+                      )}
+                    >
+                      {r.section} ↗
+                    </a>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
       </div>
+
+      <div class="runs">
+        {
+          rows.map((r) => (
+            <article class="run">
+              <h3>
+                {r.model}, {r.workload}
+              </h3>
+              <p class="run__meta">
+                {r.quant} · prompt / gen {r.tokens} · tok/s, scale 0 to {r.maxScale}
+              </p>
+              <dl class="bars">
+                <div>
+                  <dt>Normal</dt>
+                  <dd class={`bar${best(r) === 'normal' ? ' bar--best' : ''}`} aria-hidden="true">
+                    <i style={`--v:${(r.normalNum / r.maxScale).toFixed(4)}`} />
+                  </dd>
+                  <dd>{r.normal}</dd>
+                </div>
+                <div>
+                  <dt>Fixed, {fixedLabel(r)}</dt>
+                  <dd class={`bar${best(r) === 'fixed' ? ' bar--best' : ''}`} aria-hidden="true">
+                    <i style={`--v:${(r.fixedNum / r.maxScale).toFixed(4)}`} />
+                  </dd>
+                  <dd>{fixedValue(r)}</dd>
+                </div>
+                <div>
+                  <dt>Adaptive</dt>
+                  <dd class={`bar${best(r) === 'adaptive' ? ' bar--best' : ''}`} aria-hidden="true">
+                    <i style={`--v:${(r.adaptiveNum / r.maxScale).toFixed(4)}`} />
+                  </dd>
+                  <dd>{r.adaptive}</dd>
+                </div>
+              </dl>
+              <p>{r.note}</p>
+            </article>
+          ))
+        }
+      </div>
+
+      <div class="note note--warn">
+        <strong>Held-out counterexample.</strong> Ornith H4 (Riemann tensor) reports 50.16 tok/s normal,
+        42.07 fixed lookup and 47.92 adaptive. Adaptive is below normal by about 4.5%. The summary table
+        does not provide complete per-run configuration; treat it as a reported observation rather than
+        a reproducible paired estimate.
+      </div>
+    </section>
+
+    <section class="section limits" aria-labelledby="limits">
+      <h2 id="limits">What these numbers do not establish.</h2>
       <div>
         <p>
           80+ tok/s Ornith results rely on favorable speculative workloads with substantial reusable
@@ -247,45 +234,42 @@ const rows = [
           small-RAM consumer desktop.
         </p>
         <p>
-          Offline calibration measures CPU dispatch and lookup/retrieval microbenchmarks. Full
-          verification curves, GPU/context costs, and concurrent-session scaling still include
+          Offline calibration measures CPU dispatch and lookup and retrieval microbenchmarks. Full
+          verification curves, GPU and context costs, and concurrent-session scaling still include
           estimates. A doubled CPU job count is not a concurrent-session benchmark.
         </p>
         <p>
           The website does not assert successful Phase 6.6.1 sanitizer, complete CUDA CTest,
-          seeded-sampling, or concurrency validation without retained evidence. The engine report is
+          seeded-sampling or concurrency validation without retained evidence. The engine report is
           available as a historical source, with those limits noted.
         </p>
         <p>Ryzen 5 5600X / RTX 5070 results remain pending actual hardware measurement.</p>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="section wrap">
-    <div class="section-heading">
-      <span class="section-label">03 / Source archive</span>
-      <h2>Read the engineering.</h2>
-    </div>
-    <div class="pillars">
-      {
-        [
-          ['phase6', 'Phase 6', 'Populated context, KV placement, and reference comparisons.'],
-          ['phase65', 'Phase 6.5', 'CPU expert kernels, prefill, and end-to-end optimization.'],
+    <section class="section" aria-labelledby="archive">
+      <h2 id="archive">Read the engineering.</h2>
+      <ul class="archive">
+        {
           [
-            'phase66',
-            'Phase 6.6 / 6.6.1',
-            'Adaptive decoding, calibration, reported workloads, and held-out cases.',
-          ],
-        ].map(([slug, title, text]) => (
-          <article class="pillar">
-            <h3>{title}</h3>
-            <p>{text}</p>
-            <a class="text-link" href={link('docs', `${slug}/`)}>
-              Read complete source <span>↗</span>
-            </a>
-          </article>
-        ))
-      }
-    </div>
-  </section>
-</Shell>
+            ['phase6', 'Phase 6', 'Populated context, KV placement and reference comparisons.'],
+            ['phase65', 'Phase 6.5', 'CPU expert kernels, prefill and end-to-end optimization.'],
+            [
+              'phase66',
+              'Phase 6.6 and 6.6.1',
+              'Adaptive decoding, calibration, reported workloads and held-out cases.',
+            ],
+          ].map(([slug, title, text]) => (
+            <li>
+              <a href={link('docs', `${slug}/`)}>
+                <b>{title}</b>
+                <span>{text}</span>
+                <em>Read the complete source</em>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+</Site>

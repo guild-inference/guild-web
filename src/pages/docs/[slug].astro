@@ -1,7 +1,7 @@
 ---
 import { markdownProcessor } from '../../lib/markdown';
 import 'katex/dist/katex.min.css';
-import Shell from '../../layouts/Shell.astro';
+import Site from '../../layouts/Site.astro';
 import DocsSidebar from '../../components/DocsSidebar.astro';
 import { docs } from '../../lib/docs';
 import { link } from '../../lib/links';
@@ -38,32 +38,31 @@ const html = code
     return `href="${escapeAttr(url)}"`;
   });
 const index = docs.findIndex((d) => d.slug === doc.slug);
+const sections = rendered.metadata.headings.filter((h) => h.depth === 2);
 ---
 
-<Shell
+<Site
   property="docs"
+  current="docs"
   path={`${doc.slug}/`}
-  title={`${doc.title} — Guild Docs`}
+  title={`${doc.title}: Guild Docs`}
   description={`${doc.title}. ${doc.imported ? 'Complete Guild source document' : 'Practical Guild guide'} for Core ${revision.slice(0, 7)}.`}
 >
-  <div class="wrap docs-layout">
-    <DocsSidebar active={doc.slug} /><article class="docs-article">
-      <header>
-        <div class="eyebrow">{doc.category} / {revision.slice(0, 7)}</div><p>
-          {
-            doc.imported
-              ? 'Repository source · complete snapshot'
-              : 'Web guide · derived from pinned Core sources'
-          }
-        </p>{
+  <div class="docs">
+    <DocsSidebar active={doc.slug} />
+    <article class="article">
+      <header class="head">
+        <p class="head__meta">
+          {doc.category} · {doc.imported ? 'Repository source, complete snapshot' : 'Web guide'} · Core
+          {revision.slice(0, 7)}
+        </p>
+        {
           doc.imported && (
             <p class="source-line">
-              <>
-                <a href={source(doc.path)}>
-                  View {doc.path} at {revision.slice(0, 7)} ↗
-                </a>
-                <br />
-              </>
+              <a href={source(doc.path)}>
+                {doc.path} at {revision.slice(0, 7)} <span aria-hidden="true">↗</span>
+              </a>
+              <br />
               SHA-256 {doc.sha256}
             </p>
           )
@@ -71,50 +70,50 @@ const index = docs.findIndex((d) => d.slug === doc.slug);
       </header>
       {
         doc.category === 'Performance archive' && (
-          <div class="notice" style="margin-bottom:30px">
+          <div class="note note--warn">
             <strong>Historical source report.</strong> This is the complete pinned document,
             including its original validation claims. Successful full CUDA CTest, sanitizer,
-            sampling, and concurrent-session reruns for Phase 6.6.1 are not independently
-            established by the available website evidence. Read the{' '}
+            sampling and concurrent-session reruns for Phase 6.6.1 are not independently established
+            by the available website evidence. Read the{' '}
             <a href={link('guild', 'performance/')}>measurement limitations</a> before quoting
             results.
           </div>
         )
       }
-      {
-        rendered.metadata.headings.filter((h) => h.depth === 2).length > 0 && (
-          <details class="toc">
-            <>
-              <summary>On this page</summary>
-              <ul>
-                {rendered.metadata.headings
-                  .filter((h) => h.depth === 2)
-                  .map((h) => (
-                    <li>
-                      <a href={`#${h.slug}`}>{h.text}</a>
-                    </li>
-                  ))}
-              </ul>
-            </>
-          </details>
-        )
-      }
-      <div class="markdown" set:html={html} /><nav
-        class="reading-nav"
-        aria-label="Adjacent chapters"
-      >
+      <div class="markdown" set:html={html} />
+      <nav class="reading-nav" aria-label="Adjacent chapters">
         {
           index > 0 ? (
             <a href={link('docs', `${docs[index - 1].slug}/`)}>← {docs[index - 1].title}</a>
           ) : (
             <a href={link('docs')}>← All documentation</a>
           )
-        }{
+        }
+        {
           index < docs.length - 1 && (
             <a href={link('docs', `${docs[index + 1].slug}/`)}>{docs[index + 1].title} →</a>
           )
         }
       </nav>
     </article>
+    {
+      sections.length > 0 && (
+        <details class="toc">
+          <summary>On this page</summary>
+          <ul>
+            {sections.map((h) => (
+              <li>
+                <a href={`#${h.slug}`}>{h.text}</a>
+              </li>
+            ))}
+          </ul>
+        </details>
+      )
+    }
   </div>
-</Shell>
+  <script>
+    // The page outline sits open beside the article on wide screens and folded above it elsewhere.
+    const toc = document.querySelector<HTMLDetailsElement>('.toc');
+    if (toc && matchMedia('(min-width: 1181px)').matches) toc.open = true;
+  </script>
+</Site>

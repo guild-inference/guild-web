@@ -8,7 +8,7 @@ const { active } = Astro.props;
 ---
 
 <aside class="docs-side" aria-label="Documentation navigation">
-  <label for="docs-search" class="section-label">Search the documentation</label>
+  <label for="docs-search">Search the documentation</label>
   <input
     id="docs-search"
     class="docs-search"
@@ -16,10 +16,10 @@ const { active } = Astro.props;
     placeholder="Architecture, CLI, GPACK…"
     data-index={asset('search-index.json')}
   />
-  <div id="search-state" class="small-note" role="status" aria-live="polite"></div>
+  <p id="search-state" role="status" aria-live="polite"></p>
   <div id="search-results" class="docs-search-results"></div>
   <details class="docs-chapters" open>
-    <summary>Browse chapters <span aria-hidden="true">+</span></summary>
+    <summary>Chapters</summary>
     <nav aria-label="Documentation chapters">
       {
         categories.map((category) => (

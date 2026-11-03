@@ -1,0 +1,49 @@
+---
+import Stage from './Stage.astro';
+import Ecosystem from '../components/Ecosystem.astro';
+import '../styles/guild.css';
+import { link, type Property } from '../lib/links';
+interface Props {
+  title: string;
+  description: string;
+  property?: Property;
+  path?: string;
+  noindex?: boolean;
+  current?: 'guild' | 'docs' | 'models' | 'performance';
+}
+const { title, description, property = 'guild', path = '', noindex = false, current } = Astro.props;
+const tabs = [
+  ['guild', 'Engine', link('guild')],
+  ['docs', 'Docs', link('docs')],
+  ['models', 'Models', link('models')],
+  ['performance', 'Performance', link('guild', 'performance/')],
+] as const;
+---
+
+<Stage {title} {description} {property} {path} {noindex} theme="#0e110f">
+  <header class="appbar">
+    <a class="appbar__mark" href={link('guild')}>Guild</a>
+    <nav class="appbar__tabs" aria-label="Guild">
+      {
+        tabs.map(([key, label, href]) => (
+          <a {href} aria-current={key === current ? 'page' : undefined}>
+            {label}
+          </a>
+        ))
+      }
+    </nav>
+    <a class="appbar__src" href="https://github.com/guild-inference/Guild"
+      >Source <span aria-hidden="true">↗</span></a
+    >
+  </header>
+  <main id="main">
+    <slot />
+  </main>
+  <footer class="sitefoot">
+    <Ecosystem />
+    <p>
+      Guild is open source under MIT and under active development. Part of
+      <a href={link('illatio')}>The Guild Inference Project</a>, {new Date().getUTCFullYear()}.
+    </p>
+  </footer>
+</Stage>
